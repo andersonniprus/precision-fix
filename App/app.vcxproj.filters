@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="UI">
+      <UniqueIdentifier>{d4e5f6a7-b8c9-0123-def0-234567890123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Managers">
+      <UniqueIdentifier>{e5f6a7b8-c9d0-1234-ef01-345678901234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Pages">
+      <UniqueIdentifier>{f6a7b8c9-d0e1-2345-f012-456789012345}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Interfaces">
+      <UniqueIdentifier>{a7b8c9d0-e1f2-3456-0123-567890123456}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Stdafx.cpp" />
+    <ClCompile Include="Source\UI\D3D11Device.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Window.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Managers\TabManager.cpp">
+      <Filter>UI\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Pages\MousePage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Pages\KeyboardPage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Stdafx.hpp" />
+    <ClInclude Include="Include\UI\D3D11Device.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Window.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Interfaces\IPage.hpp">
+      <Filter>UI\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Managers\TabManager.hpp">
+      <Filter>UI\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\MousePage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\KeyboardPage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
