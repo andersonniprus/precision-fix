@@ -12,6 +12,8 @@ namespace Modules
 		RepeatDelay,
 		RepeatRate,
 		UsbSelectiveSuspend,
+		DataQueueSize,
+		UsbSelectiveSuspendGlobal,
 		Count,
 	};
 
@@ -24,23 +26,29 @@ namespace Modules
 		template<auto>
 		friend struct FeatureTraits;
 
-		[[nodiscard]] Core::Result<bool> load_filter_keys( ) const;
-		Core::Status apply_filter_keys( const bool& );
+		[[nodiscard]] static Core::Result<bool> load_filter_keys( );
+		static Core::Status apply_filter_keys( const bool& );
 
-		[[nodiscard]] Core::Result<bool> load_sticky_keys( ) const;
-		Core::Status apply_sticky_keys( const bool& );
+		[[nodiscard]] static Core::Result<bool> load_sticky_keys( );
+		static Core::Status apply_sticky_keys( const bool& );
 
-		[[nodiscard]] Core::Result<bool> load_toggle_keys( ) const;
-		Core::Status apply_toggle_keys( const bool& );
+		[[nodiscard]] static Core::Result<bool> load_toggle_keys( );
+		static Core::Status apply_toggle_keys( const bool& );
 
-		[[nodiscard]] Core::Result<std::uint32_t> load_repeat_delay( ) const;
-		Core::Status apply_repeat_delay( const std::uint32_t& );
+		[[nodiscard]] static Core::Result<std::uint32_t> load_repeat_delay( );
+		static Core::Status apply_repeat_delay( const std::uint32_t& );
 
-		[[nodiscard]] Core::Result<std::uint32_t> load_repeat_rate( ) const;
-		Core::Status apply_repeat_rate( const std::uint32_t& );
+		[[nodiscard]] static Core::Result<std::uint32_t> load_repeat_rate( );
+		static Core::Status apply_repeat_rate( const std::uint32_t& );
 
-		[[nodiscard]] Core::Result<bool> load_usb_selective_suspend( ) const;
-		Core::Status apply_usb_selective_suspend( const bool& );
+		[[nodiscard]] static Core::Result<bool> load_usb_selective_suspend( );
+		static Core::Status apply_usb_selective_suspend( const bool& );
+
+		[[nodiscard]] static Core::Result<std::uint32_t> load_data_queue_size( );
+		static Core::Status apply_data_queue_size( const std::uint32_t& );
+
+		[[nodiscard]] static Core::Result<bool> load_usb_selective_suspend_global( );
+		static Core::Status apply_usb_selective_suspend_global( const bool& );
 	};
 
 	template<>
@@ -125,5 +133,33 @@ namespace Modules
 
 		static constexpr auto load  = &KeyboardModule::load_usb_selective_suspend;
 		static constexpr auto apply = &KeyboardModule::apply_usb_selective_suspend;
+	};
+
+	template<>
+	struct FeatureTraits<KeyboardFeature::DataQueueSize>
+	{
+		using value_type = std::uint32_t;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return 100;
+		}
+
+		static constexpr auto load  = &KeyboardModule::load_data_queue_size;
+		static constexpr auto apply = &KeyboardModule::apply_data_queue_size;
+	};
+
+	template<>
+	struct FeatureTraits<KeyboardFeature::UsbSelectiveSuspendGlobal>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &KeyboardModule::load_usb_selective_suspend_global;
+		static constexpr auto apply = &KeyboardModule::apply_usb_selective_suspend_global;
 	};
 }

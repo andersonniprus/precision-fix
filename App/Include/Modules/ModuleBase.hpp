@@ -25,7 +25,7 @@ namespace Modules
 		template<FeatureEnum F>
 		Core::Status set( const FeatureTraits<F>::value_type& value )
 		{
-			if ( auto status = ( self( ).*FeatureTraits<F>::apply )( value ); !status )
+			if ( auto status = FeatureTraits<F>::apply( value ); !status )
 				return status;
 
 			values_[ index<F>( ) ] = value;
@@ -54,18 +54,7 @@ namespace Modules
 		template<FeatureEnum F>
 		void load( ) noexcept
 		{
-			values_[ index<F>( ) ] = ( self( ).*FeatureTraits<F>::load )( )
-					.value_or( FeatureTraits<F>::fallback( ) );
-		}
-
-		[[nodiscard]] Derived& self( ) noexcept
-		{
-			return static_cast<Derived&>( *this );
-		}
-
-		[[nodiscard]] const Derived& self( ) const noexcept
-		{
-			return static_cast<const Derived&>( *this );
+			values_[ index<F>( ) ] = FeatureTraits<F>::load( ).value_or( FeatureTraits<F>::fallback( ) );
 		}
 
 		std::array<FeatureValue, count> values_ {};

@@ -41,10 +41,34 @@
     <ClCompile Include="Source\UI\Pages\KeyboardPage.cpp">
       <Filter>UI\Pages</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Pages\SystemPage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Pages\NetworkPage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Pages\GpuPage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Pages\AudioPage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Modules\MouseModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Source\Modules\KeyboardModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Modules\SystemModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Modules\NetworkModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Modules\GpuModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Modules\AudioModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
   </ItemGroup>
@@ -58,6 +82,18 @@
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Include\Modules\KeyboardModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules\SystemModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules\NetworkModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules\GpuModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules\AudioModule.hpp">
       <Filter>Modules</Filter>
     </ClInclude>
     <ClInclude Include="Include\Utils\Registry.hpp">
@@ -88,6 +124,18 @@
       <Filter>UI\Pages</Filter>
     </ClInclude>
     <ClInclude Include="Include\UI\Pages\KeyboardPage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\SystemPage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\NetworkPage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\GpuPage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\AudioPage.hpp">
       <Filter>UI\Pages</Filter>
     </ClInclude>
   </ItemGroup>

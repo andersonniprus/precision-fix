@@ -11,6 +11,7 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
+#include <algorithm>
 #include <atomic>
 #include <bit>
 #include <cstdint>
@@ -26,6 +27,7 @@
 #include <cassert>
 #include <cstring>
 #include <cwchar>
+#include <cwctype>
 #include <expected>
 #include <span>
 #include <string_view>

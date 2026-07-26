@@ -159,4 +159,41 @@ namespace Utils::Registry
 
 		return {};
 	}
+
+	inline Core::Status delete_value( const HKEY root, const wchar_t* sub, const wchar_t* value )
+	{
+		if ( const LSTATUS status = RegDeleteKeyValueW( root, sub, value );
+			status != ERROR_SUCCESS && status != ERROR_FILE_NOT_FOUND && status != ERROR_PATH_NOT_FOUND )
+			return std::unexpected( map_status( status ) );
+
+		return {};
+	}
+
+	[[nodiscard]] inline Core::Result<std::vector<std::wstring>> enumerate_subkeys( const HKEY root, const wchar_t* sub )
+	{
+		const auto key = open( root, sub, KEY_READ );
+
+		if ( !key )
+			return std::unexpected( key.error( ) );
+
+		std::vector<std::wstring> names;
+		wchar_t name[ 256 ];
+
+		for ( DWORD index = 0;; ++index )
+		{
+			DWORD size = std::size( name );
+
+			const LSTATUS status = RegEnumKeyExW( key->get( ), index, name, &size, nullptr, nullptr, nullptr, nullptr );
+
+			if ( status == ERROR_NO_MORE_ITEMS )
+				break;
+
+			if ( status != ERROR_SUCCESS )
+				return std::unexpected( map_status( status ) );
+
+			names.emplace_back( name, size );
+		}
+
+		return names;
+	}
 }

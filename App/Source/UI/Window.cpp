@@ -2,8 +2,16 @@
 #include "UI/Window.hpp"
 #include "UI/Pages/MousePage.hpp"
 #include "UI/Pages/KeyboardPage.hpp"
+#include "UI/Pages/SystemPage.hpp"
+#include "UI/Pages/NetworkPage.hpp"
+#include "UI/Pages/GpuPage.hpp"
+#include "UI/Pages/AudioPage.hpp"
 #include "Modules/MouseModule.hpp"
 #include "Modules/KeyboardModule.hpp"
+#include "Modules/SystemModule.hpp"
+#include "Modules/NetworkModule.hpp"
+#include "Modules/GpuModule.hpp"
+#include "Modules/AudioModule.hpp"
 
 namespace UI
 {
@@ -79,18 +87,24 @@ namespace UI
 
 	void Window::register_services( )
 	{
-		hub_.register_services( std::make_shared<Modules::MouseModule>( ),
-		                        std::make_shared<Modules::KeyboardModule>( ) );
+		hub_.register_services(
+			std::make_shared<Modules::MouseModule>( ),
+			std::make_shared<Modules::KeyboardModule>( ),
+			std::make_shared<Modules::SystemModule>( ),
+			std::make_shared<Modules::NetworkModule>( ),
+			std::make_shared<Modules::GpuModule>( ),
+			std::make_shared<Modules::AudioModule>( )
+		);
 	}
 
 	void Window::register_tabs( )
 	{
-		tab_manager_.add_tab( "Mouse",
-		                      std::make_unique<Pages::MousePage>(
-			                      hub_.get<Modules::MouseModule>( ) ) );
-		tab_manager_.add_tab( "Keyboard",
-		                      std::make_unique<Pages::KeyboardPage>(
-			                      hub_.get<Modules::KeyboardModule>( ) ) );
+		tab_manager_.add_tab( "Mouse", std::make_unique<Pages::MousePage>( hub_.get<Modules::MouseModule>( ) ) );
+		tab_manager_.add_tab( "Keyboard", std::make_unique<Pages::KeyboardPage>( hub_.get<Modules::KeyboardModule>( ) ) );
+		tab_manager_.add_tab( "System", std::make_unique<Pages::SystemPage>( hub_.get<Modules::SystemModule>( ) ) );
+		tab_manager_.add_tab( "Network", std::make_unique<Pages::NetworkPage>( hub_.get<Modules::NetworkModule>( ) ) );
+		tab_manager_.add_tab( "GPU", std::make_unique<Pages::GpuPage>( hub_.get<Modules::GpuModule>( ) ) );
+		tab_manager_.add_tab( "Audio", std::make_unique<Pages::AudioPage>( hub_.get<Modules::AudioModule>( ) ) );
 	}
 
 	void Window::initialize_imgui( ) const

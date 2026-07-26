@@ -22,17 +22,17 @@ namespace Modules
 		template<auto>
 		friend struct FeatureTraits;
 
-		[[nodiscard]] Core::Result<bool> load_pointer_precision( ) const;
-		Core::Status apply_pointer_precision( const bool& );
+		[[nodiscard]] static Core::Result<bool> load_pointer_precision( );
+		static Core::Status apply_pointer_precision( const bool& );
 
-		[[nodiscard]] Core::Result<CurveData> load_smooth_x_curve( ) const;
-		Core::Status apply_smooth_x_curve( const CurveData& );
+		[[nodiscard]] static Core::Result<CurveData> load_smooth_x_curve( );
+		static Core::Status apply_smooth_x_curve( const CurveData& );
 
-		[[nodiscard]] Core::Result<CurveData> load_smooth_y_curve( ) const;
-		Core::Status apply_smooth_y_curve( const CurveData& );
+		[[nodiscard]] static Core::Result<CurveData> load_smooth_y_curve( );
+		static Core::Status apply_smooth_y_curve( const CurveData& );
 
-		[[nodiscard]] Core::Result<std::uint32_t> load_data_queue_size( ) const;
-		Core::Status apply_data_queue_size( const std::uint32_t& );
+		[[nodiscard]] static Core::Result<std::uint32_t> load_data_queue_size( );
+		static Core::Status apply_data_queue_size( const std::uint32_t& );
 	};
 
 	template<>

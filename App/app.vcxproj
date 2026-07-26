@@ -80,7 +80,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;advapi32.lib;powrprof.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;advapi32.lib;powrprof.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -105,20 +105,28 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;advapi32.lib;powrprof.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;advapi32.lib;powrprof.lib;ole32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Modules\GpuModule.cpp" />
+    <ClCompile Include="Source\Modules\AudioModule.cpp" />
     <ClCompile Include="Source\Modules\MouseModule.cpp" />
     <ClCompile Include="Source\Modules\KeyboardModule.cpp" />
+    <ClCompile Include="Source\Modules\NetworkModule.cpp" />
+    <ClCompile Include="Source\Modules\SystemModule.cpp" />
     <ClCompile Include="Source\UI\D3D11Device.cpp" />
     <ClCompile Include="Source\UI\Window.cpp" />
     <ClCompile Include="Source\UI\Managers\TabManager.cpp" />
     <ClCompile Include="Source\UI\Pages\MousePage.cpp" />
     <ClCompile Include="Source\UI\Pages\KeyboardPage.cpp" />
+    <ClCompile Include="Source\UI\Pages\SystemPage.cpp" />
+    <ClCompile Include="Source\UI\Pages\NetworkPage.cpp" />
+    <ClCompile Include="Source\UI\Pages\GpuPage.cpp" />
+    <ClCompile Include="Source\UI\Pages\AudioPage.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -126,6 +134,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Modules\GpuModule.hpp" />
+    <ClInclude Include="Include\Modules\AudioModule.hpp" />
+    <ClInclude Include="Include\Modules\NetworkModule.hpp" />
+    <ClInclude Include="Include\Modules\SystemModule.hpp" />
     <ClInclude Include="Include\UI\Widgets\Switch.hpp" />
     <ClInclude Include="Include\UI\Widgets\SettingsRow.hpp" />
     <ClInclude Include="Include\Error.hpp" />
@@ -141,6 +153,10 @@
     <ClInclude Include="Include\UI\Managers\TabManager.hpp" />
     <ClInclude Include="Include\UI\Pages\MousePage.hpp" />
     <ClInclude Include="Include\UI\Pages\KeyboardPage.hpp" />
+    <ClInclude Include="Include\UI\Pages\SystemPage.hpp" />
+    <ClInclude Include="Include\UI\Pages\NetworkPage.hpp" />
+    <ClInclude Include="Include\UI\Pages\GpuPage.hpp" />
+    <ClInclude Include="Include\UI\Pages\AudioPage.hpp" />
     <ClInclude Include="Include\Stdafx.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
