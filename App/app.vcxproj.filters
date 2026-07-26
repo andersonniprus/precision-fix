@@ -13,6 +13,15 @@
     <Filter Include="UI\Interfaces">
       <UniqueIdentifier>{a7b8c9d0-e1f2-3456-0123-567890123456}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Modules">
+      <UniqueIdentifier>{b8c9d0e1-f2a3-4567-1234-678901234567}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{c9d0e1f2-a3b4-5678-2345-789012345678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Widgets">
+      <UniqueIdentifier>{d0e1f2a3-b4c5-6789-3456-890123456789}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
@@ -32,11 +41,39 @@
     <ClCompile Include="Source\UI\Pages\KeyboardPage.cpp">
       <Filter>UI\Pages</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Modules\MouseModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Modules\KeyboardModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Stdafx.hpp" />
+    <ClInclude Include="Include\Error.hpp" />
+    <ClInclude Include="Include\Modules\ModuleBase.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules\MouseModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules\KeyboardModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Utils\Registry.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Utils\Power.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
     <ClInclude Include="Include\UI\D3D11Device.hpp">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Widgets\Switch.hpp">
+      <Filter>UI\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Widgets\SettingsRow.hpp">
+      <Filter>UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Include\UI\Window.hpp">
       <Filter>UI</Filter>

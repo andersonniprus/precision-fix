@@ -1,6 +1,7 @@
 #pragma once
 
 #include <windows.h>
+#include <powrprof.h>
 
 #include <d3d11.h>
 #include <dxgi1_4.h>
@@ -20,3 +21,19 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <any>
+#include <array>
+#include <cassert>
+#include <cstring>
+#include <cwchar>
+#include <expected>
+#include <span>
+#include <string_view>
+#include <type_traits>
+#include <typeindex>
+#include <unordered_map>
+#include <utility>
+#include <variant>
+
+#include "Error.hpp"
+#include "ServiceHub.hpp"

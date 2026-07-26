@@ -5,34 +5,34 @@ namespace UI
 	class D3D11Device
 	{
 	public:
-		explicit D3D11Device ( HWND );
-		~D3D11Device ( );
+		explicit D3D11Device( HWND );
+		~D3D11Device( );
 
-		D3D11Device ( const D3D11Device& )            = delete;
-		D3D11Device& operator= ( const D3D11Device& ) = delete;
+		D3D11Device( const D3D11Device& )            = delete;
+		D3D11Device& operator=( const D3D11Device& ) = delete;
 
-		void create_render_target ( );
-		void cleanup_render_target ( );
-		void resize ( UINT, UINT );
+		void create_render_target( );
+		void cleanup_render_target( );
+		void resize( UINT, UINT );
 
-		[[nodiscard]] ID3D11Device* get_device ( ) const
+		[[nodiscard]] ID3D11Device* get_device( ) const
 		{
-			return device_.Get ( );
+			return device_.Get( );
 		}
 
-		[[nodiscard]] ID3D11DeviceContext* get_device_context ( ) const
+		[[nodiscard]] ID3D11DeviceContext* get_device_context( ) const
 		{
-			return device_context_.Get ( );
+			return device_context_.Get( );
 		}
 
-		[[nodiscard]] IDXGISwapChain* get_swap_chain ( ) const
+		[[nodiscard]] IDXGISwapChain* get_swap_chain( ) const
 		{
-			return swap_chain_.Get ( );
+			return swap_chain_.Get( );
 		}
 
-		[[nodiscard]] ID3D11RenderTargetView* get_render_target_view ( ) const
+		[[nodiscard]] ID3D11RenderTargetView* get_render_target_view( ) const
 		{
-			return render_target_view_.Get ( );
+			return render_target_view_.Get( );
 		}
 
 	private:

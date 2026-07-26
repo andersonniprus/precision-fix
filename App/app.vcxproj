@@ -80,7 +80,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;advapi32.lib;powrprof.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
@@ -105,13 +105,15 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxgi.lib;advapi32.lib;powrprof.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Modules\MouseModule.cpp" />
+    <ClCompile Include="Source\Modules\KeyboardModule.cpp" />
     <ClCompile Include="Source\UI\D3D11Device.cpp" />
     <ClCompile Include="Source\UI\Window.cpp" />
     <ClCompile Include="Source\UI\Managers\TabManager.cpp" />
@@ -124,6 +126,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\UI\Widgets\Switch.hpp" />
+    <ClInclude Include="Include\UI\Widgets\SettingsRow.hpp" />
+    <ClInclude Include="Include\Error.hpp" />
+    <ClInclude Include="Include\Modules\ModuleBase.hpp" />
+    <ClInclude Include="Include\Modules\MouseModule.hpp" />
+    <ClInclude Include="Include\Modules\KeyboardModule.hpp" />
+    <ClInclude Include="Include\Utils\Registry.hpp" />
+    <ClInclude Include="Include\Utils\Power.hpp" />
+    <ClInclude Include="Include\ServiceHub.hpp" />
     <ClInclude Include="Include\UI\D3D11Device.hpp" />
     <ClInclude Include="Include\UI\Window.hpp" />
     <ClInclude Include="Include\UI\Interfaces\IPage.hpp" />
