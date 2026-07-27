@@ -53,6 +53,12 @@
     <ClCompile Include="Source\UI\Pages\AudioPage.cpp">
       <Filter>UI\Pages</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Pages\PrivacyPage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UI\Pages\DebloatPage.cpp">
+      <Filter>UI\Pages</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Modules\MouseModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
@@ -69,6 +75,12 @@
       <Filter>Modules</Filter>
     </ClCompile>
     <ClCompile Include="Source\Modules\AudioModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Modules\PrivacyModule.cpp">
+      <Filter>Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Modules\DebloatModule.cpp">
       <Filter>Modules</Filter>
     </ClCompile>
   </ItemGroup>
@@ -96,10 +108,25 @@
     <ClInclude Include="Include\Modules\AudioModule.hpp">
       <Filter>Modules</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Modules\PrivacyModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Modules\DebloatModule.hpp">
+      <Filter>Modules</Filter>
+    </ClInclude>
     <ClInclude Include="Include\Utils\Registry.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Utils\Com.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
     <ClInclude Include="Include\Utils\Power.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Utils\TaskScheduler.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Utils\AppX.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Include\UI\D3D11Device.hpp">
@@ -136,6 +163,12 @@
       <Filter>UI\Pages</Filter>
     </ClInclude>
     <ClInclude Include="Include\UI\Pages\AudioPage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\PrivacyPage.hpp">
+      <Filter>UI\Pages</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Pages\DebloatPage.hpp">
       <Filter>UI\Pages</Filter>
     </ClInclude>
   </ItemGroup>

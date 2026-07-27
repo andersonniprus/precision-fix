@@ -2,6 +2,7 @@
 
 #include "UI/Interfaces/IPage.hpp"
 #include "Modules/SystemModule.hpp"
+#include "UI/Widgets/SettingsRow.hpp"
 
 namespace UI::Pages
 {
@@ -18,9 +19,11 @@ namespace UI::Pages
 		void render_power( );
 		void render_advanced( );
 		void render_responsiveness( );
+		void render_explorer( );
+		void render_storage( );
 
 		template<Modules::SystemFeature F>
-		void render_preset_row( const char* title, const char* description, std::uint32_t optimized );
+		void render_preset_row( const char* title, const char* description, std::uint32_t optimized, Widgets::Level gain, Widgets::Level impact );
 
 		void set_status( const Core::Status& );
 

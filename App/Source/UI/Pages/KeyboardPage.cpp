@@ -32,6 +32,8 @@ namespace UI::Pages
 			"Ignores brief or repeated keystrokes.",
 			switch_width,
 			switch_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
 			[ & ]
 			{
 				if ( Widgets::toggle_switch( "Filter Keys", &filter_keys ) )
@@ -48,6 +50,8 @@ namespace UI::Pages
 			"Lets modifier keys stay active without holding them down.",
 			switch_width,
 			switch_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
 			[ & ]
 			{
 				if ( Widgets::toggle_switch( "Sticky Keys", &sticky_keys ) )
@@ -64,10 +68,30 @@ namespace UI::Pages
 			"Plays a tone when Caps Lock, Num Lock or Scroll Lock changes.",
 			switch_width,
 			switch_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
 			[ & ]
 			{
 				if ( Widgets::toggle_switch( "Toggle Keys", &toggle_keys ) )
 					set_status( keyboard_->set<Modules::KeyboardFeature::ToggleKeys>( toggle_keys ) );
+			}
+		);
+
+		ImGui::Separator( );
+
+		bool mouse_keys = keyboard_->get<Modules::KeyboardFeature::MouseKeys>( );
+
+		Widgets::settings_row(
+			"Mouse Keys",
+			"Lets the numeric keypad move the mouse pointer.",
+			switch_width,
+			switch_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
+			[ & ]
+			{
+				if ( Widgets::toggle_switch( "Mouse Keys", &mouse_keys ) )
+					set_status( keyboard_->set<Modules::KeyboardFeature::MouseKeys>( mouse_keys ) );
 			}
 		);
 	}
@@ -84,6 +108,8 @@ namespace UI::Pages
 			"Time before a held key starts repeating.",
 			row_width,
 			control_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
 			[ & ]
 			{
 				if ( ImGui::Button( "Default", ImVec2( Widgets::preset_button_width, 0.f ) ) )
@@ -116,6 +142,8 @@ namespace UI::Pages
 			"Speed of key repetition once it starts.",
 			row_width,
 			control_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
 			[ & ]
 			{
 				if ( ImGui::Button( "Default", ImVec2( Widgets::preset_button_width, 0.f ) ) )
@@ -149,6 +177,8 @@ namespace UI::Pages
 			"Lets Windows suspend idle USB devices to save power.",
 			switch_width,
 			switch_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
 			[ & ]
 			{
 				if ( Widgets::toggle_switch( "USB selective suspend", &selective_suspend ) )

@@ -110,4 +110,27 @@ namespace Modules
 
 		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, queue_size_key, L"MouseDataQueueSize", value );
 	}
+
+	Core::Result<std::uint32_t> MouseModule::load_pointer_speed( )
+	{
+		int speed {};
+
+		if ( !SystemParametersInfoW( SPI_GETMOUSESPEED, 0, &speed, 0 ) )
+			return std::unexpected( Core::Error::Unknown );
+
+		return static_cast<std::uint32_t>( speed );
+	}
+
+	Core::Status MouseModule::apply_pointer_speed( const std::uint32_t& value )
+	{
+		if ( value < 1 || value > 20 )
+			return std::unexpected( Core::Error::InvalidValue );
+
+		const auto data = reinterpret_cast<PVOID>( static_cast<UINT_PTR>( value ) );
+
+		if ( !SystemParametersInfoW( SPI_SETMOUSESPEED, 0, data, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE ) )
+			return std::unexpected( Core::Error::Unknown );
+
+		return {};
+	}
 }

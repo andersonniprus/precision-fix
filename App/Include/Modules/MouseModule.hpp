@@ -10,6 +10,7 @@ namespace Modules
 		SmoothMouseXCurve,
 		SmoothMouseYCurve,
 		DataQueueSize,
+		PointerSpeed,
 		Count,
 	};
 
@@ -33,6 +34,9 @@ namespace Modules
 
 		[[nodiscard]] static Core::Result<std::uint32_t> load_data_queue_size( );
 		static Core::Status apply_data_queue_size( const std::uint32_t& );
+
+		[[nodiscard]] static Core::Result<std::uint32_t> load_pointer_speed( );
+		static Core::Status apply_pointer_speed( const std::uint32_t& );
 	};
 
 	template<>
@@ -101,5 +105,19 @@ namespace Modules
 
 		static constexpr auto load  = &MouseModule::load_data_queue_size;
 		static constexpr auto apply = &MouseModule::apply_data_queue_size;
+	};
+
+	template<>
+	struct FeatureTraits<MouseFeature::PointerSpeed>
+	{
+		using value_type = std::uint32_t;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return 10;
+		}
+
+		static constexpr auto load  = &MouseModule::load_pointer_speed;
+		static constexpr auto apply = &MouseModule::apply_pointer_speed;
 	};
 }

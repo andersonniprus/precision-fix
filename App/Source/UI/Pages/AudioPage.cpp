@@ -32,6 +32,8 @@ namespace UI::Pages
 			"System effects (APOs) applied to every active playback and recording device. Support varies by driver.",
 			switch_width,
 			switch_height,
+			Widgets::Level::Low,
+			Widgets::Level::Low,
 			[ & ]
 			{
 				if ( Widgets::toggle_switch( "Audio enhancements", &enhancements ) )

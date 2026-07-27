@@ -14,6 +14,7 @@ namespace Modules
 		UsbSelectiveSuspend,
 		DataQueueSize,
 		UsbSelectiveSuspendGlobal,
+		MouseKeys,
 		Count,
 	};
 
@@ -49,6 +50,9 @@ namespace Modules
 
 		[[nodiscard]] static Core::Result<bool> load_usb_selective_suspend_global( );
 		static Core::Status apply_usb_selective_suspend_global( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_mouse_keys( );
+		static Core::Status apply_mouse_keys( const bool& );
 	};
 
 	template<>
@@ -161,5 +165,19 @@ namespace Modules
 
 		static constexpr auto load  = &KeyboardModule::load_usb_selective_suspend_global;
 		static constexpr auto apply = &KeyboardModule::apply_usb_selective_suspend_global;
+	};
+
+	template<>
+	struct FeatureTraits<KeyboardFeature::MouseKeys>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &KeyboardModule::load_mouse_keys;
+		static constexpr auto apply = &KeyboardModule::apply_mouse_keys;
 	};
 }

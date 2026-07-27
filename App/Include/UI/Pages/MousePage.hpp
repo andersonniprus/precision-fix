@@ -2,6 +2,7 @@
 
 #include "UI/Interfaces/IPage.hpp"
 #include "Modules/MouseModule.hpp"
+#include "UI/Widgets/SettingsRow.hpp"
 
 namespace UI::Pages
 {
@@ -18,7 +19,7 @@ namespace UI::Pages
 		void render_latency( );
 
 		template<Modules::MouseFeature F>
-		void render_curve_presets( const char* title, const char* description );
+		void render_curve_presets( const char* title, const char* description, Widgets::Level gain, Widgets::Level impact );
 
 		void set_status( const Core::Status& );
 

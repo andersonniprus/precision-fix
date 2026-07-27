@@ -14,6 +14,15 @@ namespace
 
 	constexpr std::uint32_t prefetch_enabled  = 3;
 	constexpr std::uint32_t prefetch_disabled = 0;
+
+	constexpr wchar_t explorer_advanced_key[ ]     = LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced)";
+	constexpr wchar_t personalize_key[ ]           = LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize)";
+	constexpr wchar_t session_manager_power_key[ ] = LR"(SYSTEM\CurrentControlSet\Control\Session Manager\Power)";
+	constexpr wchar_t filesystem_key[ ]            = LR"(SYSTEM\CurrentControlSet\Control\FileSystem)";
+	constexpr wchar_t system_restore_key[ ]        = LR"(SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore)";
+	constexpr wchar_t pushnotifications_key[ ]     = LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications)";
+	constexpr wchar_t desktop_key[ ]               = LR"(Control Panel\Desktop)";
+	constexpr wchar_t control_key[ ]               = LR"(SYSTEM\CurrentControlSet\Control)";
 }
 
 namespace Modules
@@ -198,5 +207,237 @@ namespace Modules
 		}
 
 		return {};
+	}
+
+	Core::Result<bool> SystemModule::load_show_file_extensions( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_CURRENT_USER, explorer_advanced_key, L"HideFileExt" );
+
+		if ( !value )
+			return false;
+
+		return *value == 0;
+	}
+
+	Core::Status SystemModule::apply_show_file_extensions( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_CURRENT_USER, explorer_advanced_key, L"HideFileExt", enabled ? 0u : 1u );
+	}
+
+	Core::Result<bool> SystemModule::load_dark_mode( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_CURRENT_USER, personalize_key, L"AppsUseLightTheme" );
+
+		if ( !value )
+			return false;
+
+		return *value == 0;
+	}
+
+	Core::Status SystemModule::apply_dark_mode( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_CURRENT_USER, personalize_key, L"AppsUseLightTheme", enabled ? 0u : 1u );
+	}
+
+	Core::Result<bool> SystemModule::load_hibernate_enabled( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, power_key, L"HibernateEnabled" );
+
+		if ( !value )
+			return true;
+
+		return *value != 0;
+	}
+
+	Core::Status SystemModule::apply_hibernate_enabled( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, power_key, L"HibernateEnabled", enabled ? 1u : 0u );
+	}
+
+	Core::Result<bool> SystemModule::load_fast_startup( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, session_manager_power_key, L"HiberbootEnabled" );
+
+		if ( !value )
+			return true;
+
+		return *value != 0;
+	}
+
+	Core::Status SystemModule::apply_fast_startup( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, session_manager_power_key, L"HiberbootEnabled", enabled ? 1u : 0u );
+	}
+
+	Core::Result<bool> SystemModule::load_sleep_diagnostics( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, session_manager_power_key, L"SleepStudyDisabled" );
+
+		if ( !value )
+			return true;
+
+		return *value == 0;
+	}
+
+	Core::Status SystemModule::apply_sleep_diagnostics( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, session_manager_power_key, L"SleepStudyDisabled", enabled ? 0u : 1u );
+	}
+
+	Core::Result<bool> SystemModule::load_energy_estimation( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, power_key, L"EnergyEstimationEnabled" );
+
+		if ( !value )
+			return true;
+
+		return *value != 0;
+	}
+
+	Core::Status SystemModule::apply_energy_estimation( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, power_key, L"EnergyEstimationEnabled", enabled ? 1u : 0u );
+	}
+
+	Core::Result<bool> SystemModule::load_modern_standby( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, power_key, L"CsEnabled" );
+
+		if ( !value )
+			return true;
+
+		return *value != 0;
+	}
+
+	Core::Status SystemModule::apply_modern_standby( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, power_key, L"CsEnabled", enabled ? 1u : 0u );
+	}
+
+	Core::Result<std::uint32_t> SystemModule::load_svchost_split_threshold( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, control_key, L"SvcHostSplitThresholdInKB" );
+
+		if ( value )
+			return *value;
+
+		if ( value.error( ) != Core::Error::NotFound )
+			return std::unexpected( value.error( ) );
+
+		MEMORYSTATUSEX status { .dwLength = sizeof( status ) };
+
+		if ( !GlobalMemoryStatusEx( &status ) )
+			return std::unexpected( Core::Error::Unknown );
+
+		return static_cast<std::uint32_t>( status.ullTotalPhys / 1024 );
+	}
+
+	Core::Status SystemModule::apply_svchost_split_threshold( const std::uint32_t& value )
+	{
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, control_key, L"SvcHostSplitThresholdInKB", value );
+	}
+
+	Core::Result<std::uint32_t> SystemModule::load_disable_last_access_timestamps( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, filesystem_key, L"NtfsDisableLastAccessUpdate" );
+
+		if ( !value )
+			return 2;
+
+		return *value;
+	}
+
+	Core::Status SystemModule::apply_disable_last_access_timestamps( const std::uint32_t& value )
+	{
+		if ( value > 3 )
+			return std::unexpected( Core::Error::InvalidValue );
+
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, filesystem_key, L"NtfsDisableLastAccessUpdate", value );
+	}
+
+	Core::Result<std::uint32_t> SystemModule::load_disable_8dot3_name_creation( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, filesystem_key, L"NtfsDisable8dot3NameCreation" );
+
+		if ( !value )
+			return 2;
+
+		return *value;
+	}
+
+	Core::Status SystemModule::apply_disable_8dot3_name_creation( const std::uint32_t& value )
+	{
+		if ( value > 3 )
+			return std::unexpected( Core::Error::InvalidValue );
+
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, filesystem_key, L"NtfsDisable8dot3NameCreation", value );
+	}
+
+	Core::Result<std::uint32_t> SystemModule::load_restore_point_frequency( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, system_restore_key, L"SystemRestorePointCreationFrequency" );
+
+		if ( !value )
+			return 1440;
+
+		return *value;
+	}
+
+	Core::Status SystemModule::apply_restore_point_frequency( const std::uint32_t& value )
+	{
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, system_restore_key, L"SystemRestorePointCreationFrequency", value );
+	}
+
+	Core::Result<bool> SystemModule::load_toast_notifications( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_CURRENT_USER, pushnotifications_key, L"ToastEnabled" );
+
+		if ( !value )
+			return true;
+
+		return *value != 0;
+	}
+
+	Core::Status SystemModule::apply_toast_notifications( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_CURRENT_USER, pushnotifications_key, L"ToastEnabled", enabled ? 1u : 0u );
+	}
+
+	Core::Result<bool> SystemModule::load_fast_app_termination( )
+	{
+		const auto value = Utils::Registry::read_sz( HKEY_CURRENT_USER, desktop_key, L"AutoEndTasks" );
+
+		if ( !value )
+			return false;
+
+		return *value == L"1";
+	}
+
+	Core::Status SystemModule::apply_fast_app_termination( const bool& enabled )
+	{
+		if ( !enabled )
+		{
+			if ( const auto status = Utils::Registry::delete_value( HKEY_CURRENT_USER, desktop_key, L"AutoEndTasks" ); !status )
+				return status;
+
+			if ( const auto status = Utils::Registry::delete_value( HKEY_CURRENT_USER, desktop_key, L"HungAppTimeout" ); !status )
+				return status;
+
+			if ( const auto status = Utils::Registry::delete_value( HKEY_CURRENT_USER, desktop_key, L"WaitToKillAppTimeout" ); !status )
+				return status;
+
+			return Utils::Registry::delete_value( HKEY_CURRENT_USER, desktop_key, L"LowLevelHooksTimeout" );
+		}
+
+		if ( const auto status = Utils::Registry::write_sz( HKEY_CURRENT_USER, desktop_key, L"AutoEndTasks", L"1" ); !status )
+			return status;
+
+		if ( const auto status = Utils::Registry::write_sz( HKEY_CURRENT_USER, desktop_key, L"HungAppTimeout", L"1000" ); !status )
+			return status;
+
+		if ( const auto status = Utils::Registry::write_sz( HKEY_CURRENT_USER, desktop_key, L"WaitToKillAppTimeout", L"1000" ); !status )
+			return status;
+
+		return Utils::Registry::write_sz( HKEY_CURRENT_USER, desktop_key, L"LowLevelHooksTimeout", L"1000" );
 	}
 }

@@ -1,5 +1,6 @@
 #include "Stdafx.hpp"
 #include "Modules/AudioModule.hpp"
+#include "Utils/Com.hpp"
 
 #include <initguid.h>
 #include <mmdeviceapi.h>
@@ -9,29 +10,6 @@
 namespace
 {
 	using Microsoft::WRL::ComPtr;
-
-	class ComGuard
-	{
-	public:
-		ComGuard( ) noexcept
-			: result_( CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED ) )
-		{
-		}
-
-		~ComGuard( )
-		{
-			if ( SUCCEEDED( result_ ) )
-				CoUninitialize( );
-		}
-
-		[[nodiscard]] bool ok( ) const noexcept
-		{
-			return SUCCEEDED( result_ ) || result_ == RPC_E_CHANGED_MODE;
-		}
-
-	private:
-		HRESULT result_;
-	};
 
 	[[nodiscard]] Core::Error map_hresult( const HRESULT hr ) noexcept
 	{
@@ -89,7 +67,7 @@ namespace Modules
 
 	Core::Result<bool> AudioModule::load_enhancements( )
 	{
-		ComGuard com;
+		const Utils::Com::Guard com;
 
 		if ( !com.ok( ) )
 			return std::unexpected( Core::Error::Unknown );
@@ -129,7 +107,7 @@ namespace Modules
 
 	Core::Status AudioModule::apply_enhancements( const bool& enabled )
 	{
-		ComGuard com;
+		const Utils::Com::Guard com;
 
 		if ( !com.ok( ) )
 			return std::unexpected( Core::Error::Unknown );

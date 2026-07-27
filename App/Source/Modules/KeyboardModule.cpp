@@ -178,4 +178,29 @@ namespace Modules
 	{
 		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, usb_service_key, L"DisableSelectiveSuspend", enabled ? 0u : 1u );
 	}
+
+	Core::Result<bool> KeyboardModule::load_mouse_keys( )
+	{
+		MOUSEKEYS mouse_keys { .cbSize = sizeof( MOUSEKEYS ) };
+
+		if ( !SystemParametersInfoW( SPI_GETMOUSEKEYS, sizeof( mouse_keys ), &mouse_keys, 0 ) )
+			return std::unexpected( Core::Error::Unknown );
+
+		return ( mouse_keys.dwFlags & MKF_MOUSEKEYSON ) != 0;
+	}
+
+	Core::Status KeyboardModule::apply_mouse_keys( const bool& enabled )
+	{
+		MOUSEKEYS mouse_keys { .cbSize = sizeof( MOUSEKEYS ) };
+
+		if ( !SystemParametersInfoW( SPI_GETMOUSEKEYS, sizeof( mouse_keys ), &mouse_keys, 0 ) )
+			return std::unexpected( Core::Error::Unknown );
+
+		mouse_keys.dwFlags = enabled ? ( mouse_keys.dwFlags | MKF_MOUSEKEYSON ) : ( mouse_keys.dwFlags & ~MKF_MOUSEKEYSON );
+
+		if ( !SystemParametersInfoW( SPI_SETMOUSEKEYS, sizeof( mouse_keys ), &mouse_keys, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE ) )
+			return std::unexpected( Core::Error::Unknown );
+
+		return {};
+	}
 }

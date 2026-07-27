@@ -17,6 +17,19 @@ namespace Modules
 		ForegroundLockTimeout,
 		MenuShowDelay,
 		UiAnimations,
+		ShowFileExtensions,
+		DarkMode,
+		HibernateEnabled,
+		FastStartup,
+		SleepDiagnostics,
+		EnergyEstimation,
+		ModernStandby,
+		SvcHostSplitThreshold,
+		DisableLastAccessTimestamps,
+		Disable8dot3NameCreation,
+		RestorePointFrequency,
+		ToastNotifications,
+		FastAppTermination,
 		Count,
 	};
 
@@ -61,6 +74,45 @@ namespace Modules
 
 		[[nodiscard]] static Core::Result<bool> load_ui_animations( );
 		static Core::Status apply_ui_animations( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_show_file_extensions( );
+		static Core::Status apply_show_file_extensions( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_dark_mode( );
+		static Core::Status apply_dark_mode( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_hibernate_enabled( );
+		static Core::Status apply_hibernate_enabled( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_fast_startup( );
+		static Core::Status apply_fast_startup( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_sleep_diagnostics( );
+		static Core::Status apply_sleep_diagnostics( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_energy_estimation( );
+		static Core::Status apply_energy_estimation( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_modern_standby( );
+		static Core::Status apply_modern_standby( const bool& );
+
+		[[nodiscard]] static Core::Result<std::uint32_t> load_svchost_split_threshold( );
+		static Core::Status apply_svchost_split_threshold( const std::uint32_t& );
+
+		[[nodiscard]] static Core::Result<std::uint32_t> load_disable_last_access_timestamps( );
+		static Core::Status apply_disable_last_access_timestamps( const std::uint32_t& );
+
+		[[nodiscard]] static Core::Result<std::uint32_t> load_disable_8dot3_name_creation( );
+		static Core::Status apply_disable_8dot3_name_creation( const std::uint32_t& );
+
+		[[nodiscard]] static Core::Result<std::uint32_t> load_restore_point_frequency( );
+		static Core::Status apply_restore_point_frequency( const std::uint32_t& );
+
+		[[nodiscard]] static Core::Result<bool> load_toast_notifications( );
+		static Core::Status apply_toast_notifications( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_fast_app_termination( );
+		static Core::Status apply_fast_app_termination( const bool& );
 	};
 
 	template<>
@@ -215,5 +267,187 @@ namespace Modules
 
 		static constexpr auto load  = &SystemModule::load_ui_animations;
 		static constexpr auto apply = &SystemModule::apply_ui_animations;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::ShowFileExtensions>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &SystemModule::load_show_file_extensions;
+		static constexpr auto apply = &SystemModule::apply_show_file_extensions;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::DarkMode>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &SystemModule::load_dark_mode;
+		static constexpr auto apply = &SystemModule::apply_dark_mode;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::HibernateEnabled>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_hibernate_enabled;
+		static constexpr auto apply = &SystemModule::apply_hibernate_enabled;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::FastStartup>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_fast_startup;
+		static constexpr auto apply = &SystemModule::apply_fast_startup;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::SleepDiagnostics>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_sleep_diagnostics;
+		static constexpr auto apply = &SystemModule::apply_sleep_diagnostics;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::EnergyEstimation>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_energy_estimation;
+		static constexpr auto apply = &SystemModule::apply_energy_estimation;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::ModernStandby>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_modern_standby;
+		static constexpr auto apply = &SystemModule::apply_modern_standby;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::SvcHostSplitThreshold>
+	{
+		using value_type = std::uint32_t;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return 4194304;
+		}
+
+		static constexpr auto load  = &SystemModule::load_svchost_split_threshold;
+		static constexpr auto apply = &SystemModule::apply_svchost_split_threshold;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::DisableLastAccessTimestamps>
+	{
+		using value_type = std::uint32_t;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return 2;
+		}
+
+		static constexpr auto load  = &SystemModule::load_disable_last_access_timestamps;
+		static constexpr auto apply = &SystemModule::apply_disable_last_access_timestamps;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::Disable8dot3NameCreation>
+	{
+		using value_type = std::uint32_t;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return 2;
+		}
+
+		static constexpr auto load  = &SystemModule::load_disable_8dot3_name_creation;
+		static constexpr auto apply = &SystemModule::apply_disable_8dot3_name_creation;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::RestorePointFrequency>
+	{
+		using value_type = std::uint32_t;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return 1440;
+		}
+
+		static constexpr auto load  = &SystemModule::load_restore_point_frequency;
+		static constexpr auto apply = &SystemModule::apply_restore_point_frequency;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::ToastNotifications>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_toast_notifications;
+		static constexpr auto apply = &SystemModule::apply_toast_notifications;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::FastAppTermination>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &SystemModule::load_fast_app_termination;
+		static constexpr auto apply = &SystemModule::apply_fast_app_termination;
 	};
 }

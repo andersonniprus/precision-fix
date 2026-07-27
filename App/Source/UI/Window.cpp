@@ -6,12 +6,16 @@
 #include "UI/Pages/NetworkPage.hpp"
 #include "UI/Pages/GpuPage.hpp"
 #include "UI/Pages/AudioPage.hpp"
+#include "UI/Pages/PrivacyPage.hpp"
+#include "UI/Pages/DebloatPage.hpp"
 #include "Modules/MouseModule.hpp"
 #include "Modules/KeyboardModule.hpp"
 #include "Modules/SystemModule.hpp"
 #include "Modules/NetworkModule.hpp"
 #include "Modules/GpuModule.hpp"
 #include "Modules/AudioModule.hpp"
+#include "Modules/PrivacyModule.hpp"
+#include "Modules/DebloatModule.hpp"
 
 namespace UI
 {
@@ -93,7 +97,9 @@ namespace UI
 			std::make_shared<Modules::SystemModule>( ),
 			std::make_shared<Modules::NetworkModule>( ),
 			std::make_shared<Modules::GpuModule>( ),
-			std::make_shared<Modules::AudioModule>( )
+			std::make_shared<Modules::AudioModule>( ),
+			std::make_shared<Modules::PrivacyModule>( ),
+			std::make_shared<Modules::DebloatModule>( )
 		);
 	}
 
@@ -105,6 +111,8 @@ namespace UI
 		tab_manager_.add_tab( "Network", std::make_unique<Pages::NetworkPage>( hub_.get<Modules::NetworkModule>( ) ) );
 		tab_manager_.add_tab( "GPU", std::make_unique<Pages::GpuPage>( hub_.get<Modules::GpuModule>( ) ) );
 		tab_manager_.add_tab( "Audio", std::make_unique<Pages::AudioPage>( hub_.get<Modules::AudioModule>( ) ) );
+		tab_manager_.add_tab( "Privacy", std::make_unique<Pages::PrivacyPage>( hub_.get<Modules::PrivacyModule>( ) ) );
+		tab_manager_.add_tab( "Debloat", std::make_unique<Pages::DebloatPage>( hub_.get<Modules::DebloatModule>( ) ) );
 	}
 
 	void Window::initialize_imgui( ) const
