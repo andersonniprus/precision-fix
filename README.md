@@ -2,6 +2,8 @@
 
 Windows desktop app (ImGui + DirectX 11) for tuning system performance and responsiveness through registry and OS-level tweaks. Each toggle applies a real setting, not a scripted preset — changes are read from and written directly to the system.
 
+![precision-fix UI](docs/screenshot.png)
+
 ## Gain / impact indicator
 
 Every setting row shows two small colored bars:
