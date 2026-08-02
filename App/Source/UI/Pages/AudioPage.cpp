@@ -1,10 +1,16 @@
 #include "Stdafx.hpp"
 #include "UI/Pages/AudioPage.hpp"
+#include "UI/Theme.hpp"
+#include "UI/Fonts/IconsLucide.h"
+#include "UI/Widgets/Section.hpp"
 #include "UI/Widgets/SettingsRow.hpp"
 #include "UI/Widgets/Switch.hpp"
 
 namespace UI::Pages
 {
+	using namespace Widgets;
+	using enum Modules::AudioFeature;
+
 	AudioPage::AudioPage( std::shared_ptr<Modules::AudioModule> audio )
 		: audio_( std::move( audio ) )
 	{
@@ -22,26 +28,32 @@ namespace UI::Pages
 
 	void AudioPage::render( )
 	{
-		const float switch_width  = ImGui::GetFrameHeight( ) * Widgets::switch_aspect;
+		const float switch_width  = ImGui::GetFrameHeight( ) * switch_aspect;
 		const float switch_height = ImGui::GetFrameHeight( );
 
-		bool enhancements = audio_->get<Modules::AudioFeature::Enhancements>( );
+		section( ICON_LC_VOLUME_2, "Playback", "System-wide audio effects.", [ & ]
+		{
+			bool enhancements = audio_->get<Enhancements>( );
 
-		Widgets::settings_row(
-			"Audio enhancements",
-			"System effects (APOs) applied to every active playback and recording device. Support varies by driver.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Low,
-			Widgets::Level::Low,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "Audio enhancements", &enhancements ) )
-					set_status( audio_->set<Modules::AudioFeature::Enhancements>( enhancements ) );
-			}
-		);
+			settings_row(
+				"Audio enhancements",
+				"System effects (APOs) applied to every active playback and recording device. Support varies by driver.",
+				switch_width, switch_height,
+				Level::Low, Level::Low,
+				"Off",
+				[ & ]
+				{
+					if ( toggle_switch( "Audio enhancements", &enhancements ) )
+					{
+						set_status( audio_->set<Enhancements>( enhancements ) );
+					}
+				}
+			);
+		} );
 
 		if ( !status_.empty( ) )
-			ImGui::TextColored( ImVec4( 1.f, 0.35f, 0.35f, 1.f ), "%s", status_.c_str( ) );
+		{
+			ImGui::TextColored( Theme::Danger, "%s", status_.c_str( ) );
+		}
 	}
 }

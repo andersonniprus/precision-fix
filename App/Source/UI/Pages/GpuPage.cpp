@@ -1,10 +1,16 @@
 #include "Stdafx.hpp"
 #include "UI/Pages/GpuPage.hpp"
+#include "UI/Theme.hpp"
+#include "UI/Fonts/IconsLucide.h"
+#include "UI/Widgets/Section.hpp"
 #include "UI/Widgets/SettingsRow.hpp"
 #include "UI/Widgets/Switch.hpp"
 
 namespace UI::Pages
 {
+	using namespace Widgets;
+	using enum Modules::GpuFeature;
+
 	GpuPage::GpuPage( std::shared_ptr<Modules::GpuModule> gpu )
 		: gpu_( std::move( gpu ) )
 	{
@@ -22,116 +28,120 @@ namespace UI::Pages
 
 	void GpuPage::render( )
 	{
-		const float switch_width  = ImGui::GetFrameHeight( ) * Widgets::switch_aspect;
+		const float switch_width  = ImGui::GetFrameHeight( ) * switch_aspect;
 		const float switch_height = ImGui::GetFrameHeight( );
 
-		bool preemption = gpu_->get<Modules::GpuFeature::Preemption>( );
+		section( ICON_LC_CPU, "Scheduling", "GPU task scheduling and preemption.", [ & ]
+		{
+			bool preemption = gpu_->get<Preemption>( );
 
-		Widgets::settings_row(
-			"GPU preemption",
-			"Lets the scheduler interrupt a running graphics task to service another one.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Medium,
-			Widgets::Level::Medium,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "GPU preemption", &preemption ) )
-					set_status( gpu_->set<Modules::GpuFeature::Preemption>( preemption ) );
-			}
-		);
+			settings_row(
+				"GPU preemption",
+				"Lets the scheduler interrupt a running graphics task to service another one.",
+				switch_width, switch_height,
+				Level::Medium, Level::Medium,
+				"Off",
+				[ & ]
+				{
+					if ( toggle_switch( "GPU preemption", &preemption ) )
+					{
+						set_status( gpu_->set<Preemption>( preemption ) );
+					}
+				}
+			);
 
-		ImGui::Separator( );
+			bool hardware_scheduling = gpu_->get<HardwareGpuScheduling>( );
 
-		bool hdcp = gpu_->get<Modules::GpuFeature::Hdcp>( );
+			settings_row(
+				"Hardware-accelerated GPU scheduling",
+				"Lets the GPU manage its own video memory queue instead of the OS scheduler.",
+				switch_width, switch_height,
+				Level::Medium, Level::Low,
+				"On",
+				[ & ]
+				{
+					if ( toggle_switch( "Hardware-accelerated GPU scheduling", &hardware_scheduling ) )
+					{
+						set_status( gpu_->set<HardwareGpuScheduling>( hardware_scheduling ) );
+					}
+				}
+			);
+		} );
 
-		Widgets::settings_row(
-			"HDCP",
-			"Content-protection handshake for the display output. NVIDIA only.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Low,
-			Widgets::Level::Low,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "HDCP", &hdcp ) )
-					set_status( gpu_->set<Modules::GpuFeature::Hdcp>( hdcp ) );
-			}
-		);
+		section( ICON_LC_CIRCUIT_BOARD, "Vendor", "Driver-level tweaks. Effect not guaranteed on all versions.", [ & ]
+		{
+			bool hdcp = gpu_->get<Hdcp>( );
 
-		ImGui::Separator( );
+			settings_row(
+				"HDCP",
+				"Content-protection handshake for the display output. NVIDIA only.",
+				switch_width, switch_height,
+				Level::Low, Level::Low,
+				"Off",
+				[ & ]
+				{
+					if ( toggle_switch( "HDCP", &hdcp ) )
+					{
+						set_status( gpu_->set<Hdcp>( hdcp ) );
+					}
+				}
+			);
 
-		bool hags = gpu_->get<Modules::GpuFeature::HardwareGpuScheduling>( );
+			bool nvidia_preemption = gpu_->get<NvidiaPreemptionOverride>( );
 
-		Widgets::settings_row(
-			"Hardware-accelerated GPU scheduling",
-			"Lets the GPU manage its own video memory queue instead of the OS scheduler.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Medium,
-			Widgets::Level::Low,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "Hardware-accelerated GPU scheduling", &hags ) )
-					set_status( gpu_->set<Modules::GpuFeature::HardwareGpuScheduling>( hags ) );
-			}
-		);
+			settings_row(
+				"NVIDIA preemption override",
+				"Disables NVIDIA driver-level task preemption. Undocumented vendor tweak.",
+				switch_width, switch_height,
+				Level::Medium, Level::High,
+				"On",
+				[ & ]
+				{
+					if ( toggle_switch( "NVIDIA preemption override", &nvidia_preemption ) )
+					{
+						set_status( gpu_->set<NvidiaPreemptionOverride>( nvidia_preemption ) );
+					}
+				}
+			);
 
-		ImGui::Separator( );
+			bool amd_power_gating = gpu_->get<AmdPowerGatingDisabled>( );
 
-		bool nvidia_preemption = gpu_->get<Modules::GpuFeature::NvidiaPreemptionOverride>( );
+			settings_row(
+				"AMD power gating disabled",
+				"Disables AMD driver-level power gating for lower latency at higher idle power. Undocumented vendor tweak.",
+				switch_width, switch_height,
+				Level::Medium, Level::High,
+				"On",
+				[ & ]
+				{
+					if ( toggle_switch( "AMD power gating disabled", &amd_power_gating ) )
+					{
+						set_status( gpu_->set<AmdPowerGatingDisabled>( amd_power_gating ) );
+					}
+				}
+			);
 
-		Widgets::settings_row(
-			"NVIDIA preemption override",
-			"Disables NVIDIA driver-level task preemption. Undocumented vendor tweak, effect not guaranteed on all driver versions.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Medium,
-			Widgets::Level::High,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "NVIDIA preemption override", &nvidia_preemption ) )
-					set_status( gpu_->set<Modules::GpuFeature::NvidiaPreemptionOverride>( nvidia_preemption ) );
-			}
-		);
+			bool latency_tolerance = gpu_->get<GraphicsLatencyTolerance>( );
 
-		ImGui::Separator( );
-
-		bool amd_power_gating = gpu_->get<Modules::GpuFeature::AmdPowerGatingDisabled>( );
-
-		Widgets::settings_row(
-			"AMD power gating disabled",
-			"Disables AMD driver-level power gating for lower latency at the cost of higher idle power draw. Undocumented vendor tweak.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Medium,
-			Widgets::Level::High,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "AMD power gating disabled", &amd_power_gating ) )
-					set_status( gpu_->set<Modules::GpuFeature::AmdPowerGatingDisabled>( amd_power_gating ) );
-			}
-		);
-
-		ImGui::Separator( );
-
-		bool latency_tolerance = gpu_->get<Modules::GpuFeature::GraphicsLatencyTolerance>( );
-
-		Widgets::settings_row(
-			"Graphics latency tolerance override",
-			"Forces GPU/display power-management latency tolerances to their lowest values. Undocumented vendor tweak.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Low,
-			Widgets::Level::Medium,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "Graphics latency tolerance override", &latency_tolerance ) )
-					set_status( gpu_->set<Modules::GpuFeature::GraphicsLatencyTolerance>( latency_tolerance ) );
-			}
-		);
+			settings_row(
+				"Graphics latency tolerance override",
+				"Forces GPU/display power-management latency tolerances to their lowest values. Undocumented vendor tweak.",
+				switch_width, switch_height,
+				Level::Low, Level::Medium,
+				"On",
+				[ & ]
+				{
+					if ( toggle_switch( "Graphics latency tolerance override", &latency_tolerance ) )
+					{
+						set_status( gpu_->set<GraphicsLatencyTolerance>( latency_tolerance ) );
+					}
+				}
+			);
+		} );
 
 		if ( !status_.empty( ) )
-			ImGui::TextColored( ImVec4( 1.f, 0.35f, 0.35f, 1.f ), "%s", status_.c_str( ) );
+		{
+			ImGui::TextColored( Theme::Danger, "%s", status_.c_str( ) );
+		}
 	}
 }

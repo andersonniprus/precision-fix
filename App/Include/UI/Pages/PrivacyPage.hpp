@@ -14,14 +14,9 @@ namespace UI::Pages
 		void on_activate( ) override;
 
 	private:
-		void render_telemetry( );
-		void render_personalization( );
-		void render_gaming_and_location( );
-
 		void set_status( const Core::Status& );
 
 		std::shared_ptr<Modules::PrivacyModule> privacy_;
-
 		std::string status_;
 	};
 }

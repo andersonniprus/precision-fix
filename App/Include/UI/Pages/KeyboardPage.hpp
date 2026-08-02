@@ -14,14 +14,9 @@ namespace UI::Pages
 		void on_activate( ) override;
 
 	private:
-		void render_accessibility( );
-		void render_repeat( );
-		void render_power( );
-
 		void set_status( const Core::Status& );
 
 		std::shared_ptr<Modules::KeyboardModule> keyboard_;
-
 		std::string status_;
 	};
 }

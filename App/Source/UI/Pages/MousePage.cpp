@@ -1,5 +1,8 @@
 #include "Stdafx.hpp"
 #include "UI/Pages/MousePage.hpp"
+#include "UI/Theme.hpp"
+#include "UI/Fonts/IconsLucide.h"
+#include "UI/Widgets/Section.hpp"
 #include "UI/Widgets/SettingsRow.hpp"
 #include "UI/Widgets/Switch.hpp"
 
@@ -18,6 +21,10 @@ namespace
 
 namespace UI::Pages
 {
+	using namespace Widgets;
+	using enum Modules::MouseFeature;
+	using Modules::FeatureTraits;
+
 	MousePage::MousePage( std::shared_ptr<Modules::MouseModule> mouse )
 		: mouse_( std::move( mouse ) )
 	{
@@ -33,123 +40,136 @@ namespace UI::Pages
 		status_ = status ? std::string {} : std::string { Core::to_string( status.error( ) ) };
 	}
 
-	template<Modules::MouseFeature F>
-	void MousePage::render_curve_presets( const char* title, const char* description, const Widgets::Level gain, const Widgets::Level impact )
-	{
-		ImGui::PushID( title );
-
-		Widgets::settings_row( title, description, Widgets::preset_row_width( 2 ), ImGui::GetFrameHeight( ), gain, impact, [ & ]
-		{
-			if ( ImGui::Button( "Default", ImVec2( Widgets::preset_button_width, 0.f ) ) )
-				set_status( mouse_->set<F>( Modules::FeatureTraits<F>::fallback( ) ) );
-
-			ImGui::SameLine( );
-
-			if ( ImGui::Button( "Optimized", ImVec2( Widgets::preset_button_width, 0.f ) ) )
-				set_status( mouse_->set<F>( optimized_curve ) );
-		} );
-
-		ImGui::PopID( );
-	}
-
-	void MousePage::render_precision( )
-	{
-		const float switch_width  = ImGui::GetFrameHeight( ) * Widgets::switch_aspect;
-		const float switch_height = ImGui::GetFrameHeight( );
-
-		bool precision = mouse_->get<Modules::MouseFeature::PointerPrecision>( );
-
-		Widgets::settings_row(
-			"Enhance pointer precision",
-			"Applies Windows' acceleration curve based on movement speed.",
-			switch_width,
-			switch_height,
-			Widgets::Level::Low,
-			Widgets::Level::Low,
-			[ & ]
-			{
-				if ( Widgets::toggle_switch( "Enhance pointer precision", &precision ) )
-					set_status( mouse_->set<Modules::MouseFeature::PointerPrecision>( precision ) );
-			}
-		);
-
-		ImGui::Separator( );
-
-		render_curve_presets<Modules::MouseFeature::SmoothMouseXCurve>(
-			"Smooth mouse X curve", "Horizontal acceleration curve. Optimized removes added acceleration.",
-			Widgets::Level::Low, Widgets::Level::Low
-		);
-
-		ImGui::Separator( );
-
-		render_curve_presets<Modules::MouseFeature::SmoothMouseYCurve>(
-			"Smooth mouse Y curve", "Vertical acceleration curve. Optimized removes added acceleration.",
-			Widgets::Level::Low, Widgets::Level::Low
-		);
-
-		ImGui::Separator( );
-
-		ImGui::PushID( "Pointer speed" );
-
-		Widgets::settings_row(
-			"Pointer speed",
-			"Windows pointer-speed slider setting, from 1 (slowest) to 20 (fastest).",
-			Widgets::preset_row_width( 2 ),
-			ImGui::GetFrameHeight( ),
-			Widgets::Level::Low,
-			Widgets::Level::Low,
-			[ & ]
-			{
-				if ( ImGui::Button( "Default", ImVec2( Widgets::preset_button_width, 0.f ) ) )
-					set_status( mouse_->set<Modules::MouseFeature::PointerSpeed>(
-						Modules::FeatureTraits<Modules::MouseFeature::PointerSpeed>::fallback( ) ) );
-
-				ImGui::SameLine( );
-
-				if ( ImGui::Button( "Fastest", ImVec2( Widgets::preset_button_width, 0.f ) ) )
-					set_status( mouse_->set<Modules::MouseFeature::PointerSpeed>( 20u ) );
-			}
-		);
-
-		ImGui::PopID( );
-	}
-
-	void MousePage::render_latency( )
-	{
-		ImGui::PushID( "Mouse data queue size" );
-
-		Widgets::settings_row(
-			"Mouse data queue size",
-			"Buffered input events the driver keeps before reporting movement.",
-			Widgets::preset_row_width( 2 ),
-			ImGui::GetFrameHeight( ),
-			Widgets::Level::Medium,
-			Widgets::Level::Low,
-			[ & ]
-			{
-				if ( ImGui::Button( "Default", ImVec2( Widgets::preset_button_width, 0.f ) ) )
-					set_status( mouse_->set<Modules::MouseFeature::DataQueueSize>(
-						Modules::FeatureTraits<Modules::MouseFeature::DataQueueSize>::fallback( ) ) );
-
-				ImGui::SameLine( );
-
-				if ( ImGui::Button( "Optimized", ImVec2( Widgets::preset_button_width, 0.f ) ) )
-					set_status( mouse_->set<Modules::MouseFeature::DataQueueSize>( optimized_queue_size ) );
-			}
-		);
-
-		ImGui::PopID( );
-	}
-
 	void MousePage::render( )
 	{
-		if ( ImGui::CollapsingHeader( "Precision", ImGuiTreeNodeFlags_DefaultOpen ) )
-			render_precision( );
+		const float switch_width  = ImGui::GetFrameHeight( ) * switch_aspect;
+		const float switch_height = ImGui::GetFrameHeight( );
 
-		if ( ImGui::CollapsingHeader( "Latency", ImGuiTreeNodeFlags_DefaultOpen ) )
-			render_latency( );
+		const float control_width  = preset_row_width( 2 );
+		const float control_height = preset_button_height( );
+
+		section( ICON_LC_CROSSHAIR, "Precision", "Pointer acceleration and speed.", [ & ]
+		{
+			bool precision = mouse_->get<PointerPrecision>( );
+
+			settings_row(
+				"Enhance pointer precision",
+				"Applies Windows' acceleration curve based on movement speed.",
+				switch_width, switch_height,
+				Level::Low, Level::Low,
+				"Off",
+				[ & ]
+				{
+					if ( toggle_switch( "Enhance pointer precision", &precision ) )
+					{
+						set_status( mouse_->set<PointerPrecision>( precision ) );
+					}
+				}
+			);
+
+			ImGui::PushID( "Smooth mouse X curve" );
+			settings_row(
+				"Smooth mouse X curve",
+				"Horizontal acceleration curve. Optimized removes added acceleration.",
+				control_width, control_height,
+				Level::Low, Level::Low,
+				"Optimized",
+				[ & ]
+				{
+					if ( preset_button( "Default", ButtonVariant::Ghost ) )
+					{
+						set_status( mouse_->set<SmoothMouseXCurve>( FeatureTraits<SmoothMouseXCurve>::fallback( ) ) );
+					}
+
+					preset_same_line( );
+
+					if ( preset_button( "Optimized", ButtonVariant::Primary ) )
+					{
+						set_status( mouse_->set<SmoothMouseXCurve>( optimized_curve ) );
+					}
+				}
+			);
+			ImGui::PopID( );
+
+			ImGui::PushID( "Smooth mouse Y curve" );
+			settings_row(
+				"Smooth mouse Y curve",
+				"Vertical acceleration curve. Optimized removes added acceleration.",
+				control_width, control_height,
+				Level::Low, Level::Low,
+				"Optimized",
+				[ & ]
+				{
+					if ( preset_button( "Default", ButtonVariant::Ghost ) )
+					{
+						set_status( mouse_->set<SmoothMouseYCurve>( FeatureTraits<SmoothMouseYCurve>::fallback( ) ) );
+					}
+
+					preset_same_line( );
+
+					if ( preset_button( "Optimized", ButtonVariant::Primary ) )
+					{
+						set_status( mouse_->set<SmoothMouseYCurve>( optimized_curve ) );
+					}
+				}
+			);
+			ImGui::PopID( );
+
+			ImGui::PushID( "Pointer speed" );
+			settings_row(
+				"Pointer speed",
+				"Windows pointer-speed slider setting, from 1 (slowest) to 20 (fastest).",
+				control_width, control_height,
+				Level::Low, Level::Low,
+				"Fastest",
+				[ & ]
+				{
+					if ( preset_button( "Default", ButtonVariant::Ghost ) )
+					{
+						set_status( mouse_->set<PointerSpeed>( FeatureTraits<PointerSpeed>::fallback( ) ) );
+					}
+
+					preset_same_line( );
+
+					if ( preset_button( "Fastest", ButtonVariant::Primary ) )
+					{
+						set_status( mouse_->set<PointerSpeed>( 20u ) );
+					}
+				}
+			);
+			ImGui::PopID( );
+		} );
+
+		section( ICON_LC_TIMER, "Latency", "Input buffering and queue size.", [ & ]
+		{
+			ImGui::PushID( "Mouse data queue size" );
+			settings_row(
+				"Mouse data queue size",
+				"Buffered input events the driver keeps before reporting movement.",
+				control_width, control_height,
+				Level::Medium, Level::Low,
+				"Optimized",
+				[ & ]
+				{
+					if ( preset_button( "Default", ButtonVariant::Ghost ) )
+					{
+						set_status( mouse_->set<DataQueueSize>( FeatureTraits<DataQueueSize>::fallback( ) ) );
+					}
+
+					preset_same_line( );
+
+					if ( preset_button( "Optimized", ButtonVariant::Primary ) )
+					{
+						set_status( mouse_->set<DataQueueSize>( optimized_queue_size ) );
+					}
+				}
+			);
+			ImGui::PopID( );
+		} );
 
 		if ( !status_.empty( ) )
-			ImGui::TextColored( ImVec4( 1.f, 0.35f, 0.35f, 1.f ), "%s", status_.c_str( ) );
+		{
+			ImGui::TextColored( Theme::Danger, "%s", status_.c_str( ) );
+		}
 	}
 }

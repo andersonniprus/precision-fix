@@ -99,9 +99,7 @@ namespace Utils::TaskScheduler
 
 	[[nodiscard]] inline Core::Result<bool> is_enabled( const wchar_t* task_path )
 	{
-		const Com::Guard com;
-
-		if ( !com.ok( ) )
+		if ( const Com::Guard com; !com.ok( ) )
 			return std::unexpected( Core::Error::Unknown );
 
 		const auto task = Detail::get_task( task_path );
@@ -119,9 +117,7 @@ namespace Utils::TaskScheduler
 
 	inline Core::Status set_enabled( const wchar_t* task_path, const bool enabled )
 	{
-		const Com::Guard com;
-
-		if ( !com.ok( ) )
+		if ( const Com::Guard com; !com.ok( ) )
 			return std::unexpected( Core::Error::Unknown );
 
 		const auto task = Detail::get_task( task_path );

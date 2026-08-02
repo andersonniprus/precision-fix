@@ -1,6 +1,7 @@
 #pragma once
 
 #include <windows.h>
+#include <dwmapi.h>
 #include <powrprof.h>
 
 #include <d3d11.h>
@@ -19,6 +20,7 @@
 #include <format>
 #include <iterator>
 #include <memory>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 #include <vector>

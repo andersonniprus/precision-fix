@@ -2,6 +2,7 @@
 
 #include "UI/D3D11Device.hpp"
 #include "UI/Managers/TabManager.hpp"
+#include "UI/Managers/FontManager.hpp"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND, UINT, WPARAM, LPARAM );
 
@@ -32,16 +33,21 @@ namespace UI
 		void register_services( );
 		void register_tabs( );
 
-		void initialize_imgui( ) const;
+		void initialize_imgui( );
 		static void shutdown_imgui( );
+
+		void render_title_bar( );
 
 		static LRESULT CALLBACK wnd_proc( HWND, UINT, WPARAM, LPARAM );
 
 		HWND hwnd_ {};
 		WNDCLASSEXW wc_ {};
+		HBRUSH bg_brush_ {};
 		std::wstring title_;
+		std::string title_utf8_;
 
 		std::unique_ptr<D3D11Device> d3d_device_;
+		Managers::FontManager font_manager_;
 
 		ServiceHub hub_;
 		Managers::TabManager tab_manager_;

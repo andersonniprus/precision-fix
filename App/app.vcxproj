@@ -49,12 +49,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Build\$(Platform) - $(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Build\$(Platform) - $(Configuration)\</IntDir>
-    <IncludePath>$(ProjectDir)Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Include;$(ProjectDir)..\Resources\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Build\$(Platform) - $(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Build\$(Platform) - $(Configuration)\</IntDir>
-    <IncludePath>$(ProjectDir)Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)Include;$(ProjectDir)..\Resources\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
@@ -74,7 +74,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)..\Resources\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Stdafx.hpp</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -98,7 +98,7 @@
       <PreprocessorDefinitions>NDEBUG;NOMINMAX;_WIN32_WINNT=0x0A00;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)..\Resources\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>Stdafx.hpp</PrecompiledHeaderFile>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -125,6 +125,7 @@
     <ClCompile Include="Source\UI\D3D11Device.cpp" />
     <ClCompile Include="Source\UI\Window.cpp" />
     <ClCompile Include="Source\UI\Managers\TabManager.cpp" />
+    <ClCompile Include="Source\UI\Managers\FontManager.cpp" />
     <ClCompile Include="Source\UI\Pages\MousePage.cpp" />
     <ClCompile Include="Source\UI\Pages\KeyboardPage.cpp" />
     <ClCompile Include="Source\UI\Pages\SystemPage.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Include\UI\Window.hpp" />
     <ClInclude Include="Include\UI\Interfaces\IPage.hpp" />
     <ClInclude Include="Include\UI\Managers\TabManager.hpp" />
+    <ClInclude Include="Include\UI\Managers\FontManager.hpp" />
     <ClInclude Include="Include\UI\Pages\MousePage.hpp" />
     <ClInclude Include="Include\UI\Pages\KeyboardPage.hpp" />
     <ClInclude Include="Include\UI\Pages\SystemPage.hpp" />

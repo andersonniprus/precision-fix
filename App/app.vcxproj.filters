@@ -35,6 +35,9 @@
     <ClCompile Include="Source\UI\Managers\TabManager.cpp">
       <Filter>UI\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="Source\UI\Managers\FontManager.cpp">
+      <Filter>UI\Managers</Filter>
+    </ClCompile>
     <ClCompile Include="Source\UI\Pages\MousePage.cpp">
       <Filter>UI\Pages</Filter>
     </ClCompile>
@@ -145,6 +148,9 @@
       <Filter>UI\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="Include\UI\Managers\TabManager.hpp">
+      <Filter>UI\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\UI\Managers\FontManager.hpp">
       <Filter>UI\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Include\UI\Pages\MousePage.hpp">

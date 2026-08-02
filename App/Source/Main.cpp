@@ -9,7 +9,7 @@ int main( int, char*[ ] )
 {
 	try
 	{
-		UI::Window window( L"precision-fix", ImVec2( 600.f, 450.f ) );
+		UI::Window window( L"precision-fix", ImVec2( 760.f, 560.f ) );
 
 		window.run( );
 

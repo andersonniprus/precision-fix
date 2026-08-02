@@ -56,9 +56,7 @@ namespace Utils::AppX
 
 	[[nodiscard]] inline Core::Result<bool> is_installed( const std::wstring_view name_substring )
 	{
-		const Com::Guard com;
-
-		if ( !com.ok( ) )
+		if ( const Com::Guard com; !com.ok( ) )
 			return std::unexpected( Core::Error::Unknown );
 
 		try
@@ -73,17 +71,15 @@ namespace Utils::AppX
 
 	inline Core::Status remove( const std::wstring_view name_substring )
 	{
-		const Com::Guard com;
-
-		if ( !com.ok( ) )
+		if ( const Com::Guard com; !com.ok( ) )
 			return std::unexpected( Core::Error::Unknown );
 
 		try
 		{
-			Detail::PackageManager manager;
-
 			for ( const auto& package : Detail::find_installed( name_substring ) )
 			{
+				const Detail::PackageManager manager;
+
 				const auto result = manager.RemovePackageAsync( package.Id( ).FullName( ), Detail::RemovalOptions::RemoveForAllUsers ).get( );
 
 				if ( const auto hr = result.ExtendedErrorCode( ); FAILED( hr ) )
@@ -100,18 +96,14 @@ namespace Utils::AppX
 
 	inline Core::Status restore( const std::wstring_view name_substring )
 	{
-		const Com::Guard com;
-
-		if ( !com.ok( ) )
+		if ( const Com::Guard com; !com.ok( ) )
 			return std::unexpected( Core::Error::Unknown );
 
 		try
 		{
-			Detail::PackageManager manager;
-
 			bool matched = false;
 
-			for ( const auto& package : manager.FindProvisionedPackages( ) )
+			for ( const Detail::PackageManager manager; const auto& package : manager.FindProvisionedPackages( ) )
 			{
 				if ( !Detail::contains_ci( std::wstring_view { package.Id( ).Name( ) }, name_substring ) )
 					continue;
