@@ -30,6 +30,13 @@ namespace Modules
 		RestorePointFrequency,
 		ToastNotifications,
 		FastAppTermination,
+		GamesMmcssProfile,
+		GameMode,
+		SystemManagedPageFile,
+		SearchIndexing,
+		SysMain,
+		BackgroundApps,
+		DeliveryOptimization,
 		Count,
 	};
 
@@ -113,6 +120,27 @@ namespace Modules
 
 		[[nodiscard]] static Core::Result<bool> load_fast_app_termination( );
 		static Core::Status apply_fast_app_termination( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_games_mmcss_profile( );
+		static Core::Status apply_games_mmcss_profile( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_game_mode( );
+		static Core::Status apply_game_mode( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_system_managed_page_file( );
+		static Core::Status apply_system_managed_page_file( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_search_indexing( );
+		static Core::Status apply_search_indexing( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_sys_main( );
+		static Core::Status apply_sys_main( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_background_apps( );
+		static Core::Status apply_background_apps( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_delivery_optimization( );
+		static Core::Status apply_delivery_optimization( const bool& );
 	};
 
 	template<>
@@ -449,5 +477,103 @@ namespace Modules
 
 		static constexpr auto load  = &SystemModule::load_fast_app_termination;
 		static constexpr auto apply = &SystemModule::apply_fast_app_termination;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::GamesMmcssProfile>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &SystemModule::load_games_mmcss_profile;
+		static constexpr auto apply = &SystemModule::apply_games_mmcss_profile;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::GameMode>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_game_mode;
+		static constexpr auto apply = &SystemModule::apply_game_mode;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::SystemManagedPageFile>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_system_managed_page_file;
+		static constexpr auto apply = &SystemModule::apply_system_managed_page_file;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::SearchIndexing>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_search_indexing;
+		static constexpr auto apply = &SystemModule::apply_search_indexing;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::SysMain>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_sys_main;
+		static constexpr auto apply = &SystemModule::apply_sys_main;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::BackgroundApps>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_background_apps;
+		static constexpr auto apply = &SystemModule::apply_background_apps;
+	};
+
+	template<>
+	struct FeatureTraits<SystemFeature::DeliveryOptimization>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &SystemModule::load_delivery_optimization;
+		static constexpr auto apply = &SystemModule::apply_delivery_optimization;
 	};
 }

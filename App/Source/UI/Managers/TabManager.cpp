@@ -4,9 +4,17 @@
 
 namespace UI::Managers
 {
-	void TabManager::add_tab( std::string label, const char* icon, std::unique_ptr<IPage> page )
+	void TabManager::add_tab( std::string key, const char* icon, std::unique_ptr<IPage> page )
 	{
-		tabs_.push_back( { .label = std::move( label ), .icon = icon, .page = std::move( page ) } );
+		tabs_.push_back( { .key = std::move( key ), .icon = icon, .page = std::move( page ) } );
+	}
+
+	const char* TabManager::tab_label( const Tab& tab ) const noexcept
+	{
+		if ( intl_ )
+			return intl_->tr( tab.key );
+
+		return tab.key.c_str( );
 	}
 
 	void TabManager::render( )
@@ -52,7 +60,8 @@ namespace UI::Managers
 
 		for ( std::size_t i = 0; i < tabs_.size( ); ++i )
 		{
-			const auto& tab = tabs_[ i ];
+			const auto& tab   = tabs_[ i ];
+			const char* label = tab_label( tab );
 
 			const bool selected = ( i == active_ );
 
@@ -62,7 +71,9 @@ namespace UI::Managers
 			const ImVec2 p1 = { p0.x + width, p0.y + row_h };
 
 			const bool hovered = ImGui::IsMouseHoveringRect( p0, p1, true );
-			const bool clicked = ImGui::InvisibleButton( tab.label.c_str( ), ImVec2( width, row_h ) );
+			ImGui::PushID( static_cast<int>( i ) );
+			const bool clicked = ImGui::InvisibleButton( "##tab", ImVec2( width, row_h ) );
+			ImGui::PopID( );
 
 			if ( hovered )
 				ImGui::SetMouseCursor( ImGuiMouseCursor_Hand );
@@ -108,14 +119,14 @@ namespace UI::Managers
 			);
 
 			const float label_font_size = Theme::px( 15.f );
-			const ImVec2 label_size     = label_font->CalcTextSizeA( label_font_size, FLT_MAX, 0.f, tab.label.c_str( ) );
+			const ImVec2 label_size     = label_font->CalcTextSizeA( label_font_size, FLT_MAX, 0.f, label );
 
 			dl->AddText(
 				label_font,
 				label_font_size,
 				{ p0.x + Theme::px( 42.f ), p0.y + ( row_h - label_size.y ) * 0.5f },
 				Theme::col( text_col ),
-				tab.label.c_str( )
+				label
 			);
 		}
 

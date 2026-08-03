@@ -11,6 +11,8 @@
 #include "UI/Pages/AudioPage.hpp"
 #include "UI/Pages/PrivacyPage.hpp"
 #include "UI/Pages/DebloatPage.hpp"
+#include "UI/Pages/LogsPage.hpp"
+#include "UI/Pages/InfoPage.hpp"
 #include "Modules/MouseModule.hpp"
 #include "Modules/KeyboardModule.hpp"
 #include "Modules/SystemModule.hpp"
@@ -22,12 +24,22 @@
 
 namespace UI
 {
-	Window::Window( const wchar_t* title, const ImVec2& size )
-		: title_( title )
+	Window::Window(
+		const wchar_t* title,
+		const ImVec2& size,
+		std::shared_ptr<App::Settings> settings,
+		std::shared_ptr<App::Logger> logger,
+		std::shared_ptr<App::Intl> intl
+	)
+		: title_( title ),
+		  settings_( std::move( settings ) ),
+		  logger_( std::move( logger ) ),
+		  intl_( std::move( intl ) )
 	{
 		register_services( );
 		register_tabs( );
 		tab_manager_.set_font_manager( font_manager_ );
+		tab_manager_.set_intl( intl_ );
 
 		const int title_len = WideCharToMultiByte( CP_UTF8, 0, title, -1, nullptr, 0, nullptr, nullptr );
 		if ( title_len > 0 )
@@ -35,6 +47,8 @@ namespace UI
 			title_utf8_.resize( title_len - 1 );
 			WideCharToMultiByte( CP_UTF8, 0, title, -1, title_utf8_.data( ), title_len, nullptr, nullptr );
 		}
+
+		Theme::set_mode( settings_->theme( ) == App::ThemeMode::Light ? Theme::Mode::Light : Theme::Mode::Dark );
 
 		bg_brush_ = CreateSolidBrush( Theme::background_gdi( ) );
 
@@ -87,6 +101,9 @@ namespace UI
 
 		ShowWindow( hwnd_, SW_SHOW );
 		UpdateWindow( hwnd_ );
+
+		if ( logger_ )
+			logger_->info( "App", "window ready" );
 	}
 
 	Window::~Window( )
@@ -114,6 +131,9 @@ namespace UI
 	void Window::register_services( )
 	{
 		hub_.register_services(
+			settings_,
+			logger_,
+			intl_,
 			std::make_shared<Modules::MouseModule>( ),
 			std::make_shared<Modules::KeyboardModule>( ),
 			std::make_shared<Modules::SystemModule>( ),
@@ -127,14 +147,21 @@ namespace UI
 
 	void Window::register_tabs( )
 	{
-		tab_manager_.add_tab( "Mouse", ICON_LC_MOUSE, std::make_unique<Pages::MousePage>( hub_.get<Modules::MouseModule>( ) ) );
-		tab_manager_.add_tab( "Keyboard", ICON_LC_KEYBOARD, std::make_unique<Pages::KeyboardPage>( hub_.get<Modules::KeyboardModule>( ) ) );
-		tab_manager_.add_tab( "System", ICON_LC_SETTINGS, std::make_unique<Pages::SystemPage>( hub_.get<Modules::SystemModule>( ) ) );
-		tab_manager_.add_tab( "Network", ICON_LC_NETWORK, std::make_unique<Pages::NetworkPage>( hub_.get<Modules::NetworkModule>( ) ) );
-		tab_manager_.add_tab( "GPU", ICON_LC_CPU, std::make_unique<Pages::GpuPage>( hub_.get<Modules::GpuModule>( ) ) );
-		tab_manager_.add_tab( "Audio", ICON_LC_VOLUME_2, std::make_unique<Pages::AudioPage>( hub_.get<Modules::AudioModule>( ) ) );
-		tab_manager_.add_tab( "Privacy", ICON_LC_SHIELD, std::make_unique<Pages::PrivacyPage>( hub_.get<Modules::PrivacyModule>( ) ) );
-		tab_manager_.add_tab( "Debloat", ICON_LC_SPARKLES, std::make_unique<Pages::DebloatPage>( hub_.get<Modules::DebloatModule>( ) ) );
+		const auto logger = hub_.get<App::Logger>( );
+		const auto intl   = hub_.get<App::Intl>( );
+
+		tab_manager_.add_tab( "Mouse", ICON_LC_MOUSE, std::make_unique<Pages::MousePage>( hub_.get<Modules::MouseModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "Keyboard", ICON_LC_KEYBOARD,
+		                      std::make_unique<Pages::KeyboardPage>( hub_.get<Modules::KeyboardModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "System", ICON_LC_SETTINGS, std::make_unique<Pages::SystemPage>( hub_.get<Modules::SystemModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "Network", ICON_LC_NETWORK, std::make_unique<Pages::NetworkPage>( hub_.get<Modules::NetworkModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "GPU", ICON_LC_CPU, std::make_unique<Pages::GpuPage>( hub_.get<Modules::GpuModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "Audio", ICON_LC_VOLUME_2, std::make_unique<Pages::AudioPage>( hub_.get<Modules::AudioModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "Privacy", ICON_LC_SHIELD, std::make_unique<Pages::PrivacyPage>( hub_.get<Modules::PrivacyModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "Debloat", ICON_LC_SPARKLES,
+		                      std::make_unique<Pages::DebloatPage>( hub_.get<Modules::DebloatModule>( ), logger, intl ) );
+		tab_manager_.add_tab( "Logs", ICON_LC_CLIPBOARD_LIST, std::make_unique<Pages::LogsPage>( logger, intl ) );
+		tab_manager_.add_tab( "Info", ICON_LC_INFO, std::make_unique<Pages::InfoPage>( hub_.get<App::Settings>( ), intl, logger ) );
 	}
 
 	void Window::initialize_imgui( )
@@ -162,6 +189,24 @@ namespace UI
 		ImGui_ImplDX11_Shutdown( );
 		ImGui_ImplWin32_Shutdown( );
 		ImGui::DestroyContext( );
+	}
+
+	void Window::sync_theme( )
+	{
+		const auto desired = settings_->theme( ) == App::ThemeMode::Light ? Theme::Mode::Light : Theme::Mode::Dark;
+
+		if ( Theme::mode( ) == desired )
+			return;
+
+		Theme::set_mode( desired );
+		Theme::apply( );
+		Theme::apply_chrome( hwnd_ );
+
+		if ( bg_brush_ )
+		{
+			DeleteObject( bg_brush_ );
+			bg_brush_ = CreateSolidBrush( Theme::background_gdi( ) );
+		}
 	}
 
 	void Window::render_title_bar( )
@@ -227,7 +272,6 @@ namespace UI
 
 		ImGui::PopStyleVar( );
 
-		// Native OS drag — avoids ImGui hover dropping mid-move and Present/vsync hitching.
 		if ( ImGui::IsWindowHovered( ImGuiHoveredFlags_ChildWindows ) &&
 		     !ImGui::IsAnyItemHovered( ) &&
 		     ImGui::IsMouseClicked( ImGuiMouseButton_Left ) )
@@ -264,6 +308,8 @@ namespace UI
 				WaitMessage( );
 				continue;
 			}
+
+			sync_theme( );
 
 			font_manager_.rebuild_font_atlas_if_needed( );
 
@@ -312,7 +358,7 @@ namespace UI
 			auto* rtv = d3d_device_->get_render_target_view( );
 			d3d_device_->get_device_context( )->OMSetRenderTargets( 1, &rtv, nullptr );
 
-			constexpr float clear[ 4 ] = { Theme::Background.x, Theme::Background.y, Theme::Background.z, 1.f };
+			const float clear[ 4 ] = { Theme::Background.x, Theme::Background.y, Theme::Background.z, 1.f };
 			d3d_device_->get_device_context( )->ClearRenderTargetView( rtv, clear );
 
 			ImGui_ImplDX11_RenderDrawData( ImGui::GetDrawData( ) );

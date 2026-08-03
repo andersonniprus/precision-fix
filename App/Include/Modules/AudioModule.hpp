@@ -7,6 +7,7 @@ namespace Modules
 	enum class AudioFeature : std::uint8_t
 	{
 		Enhancements,
+		ExclusiveMode,
 		Count,
 	};
 
@@ -21,6 +22,9 @@ namespace Modules
 
 		[[nodiscard]] static Core::Result<bool> load_enhancements( );
 		static Core::Status apply_enhancements( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_exclusive_mode( );
+		static Core::Status apply_exclusive_mode( const bool& );
 	};
 
 	template<>
@@ -35,5 +39,19 @@ namespace Modules
 
 		static constexpr auto load  = &AudioModule::load_enhancements;
 		static constexpr auto apply = &AudioModule::apply_enhancements;
+	};
+
+	template<>
+	struct FeatureTraits<AudioFeature::ExclusiveMode>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &AudioModule::load_exclusive_mode;
+		static constexpr auto apply = &AudioModule::apply_exclusive_mode;
 	};
 }

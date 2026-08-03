@@ -169,6 +169,66 @@ namespace Utils::Registry
 		return {};
 	}
 
+	[[nodiscard]] inline Core::Result<std::vector<std::wstring>> read_multi_sz( const HKEY root, const wchar_t* sub, const wchar_t* value )
+	{
+		DWORD size {};
+
+		if ( const LSTATUS status = RegGetValueW( root, sub, value, RRF_RT_REG_MULTI_SZ, nullptr, nullptr, &size ); status != ERROR_SUCCESS )
+			return std::unexpected( map_status( status ) );
+
+		std::wstring buffer( size / sizeof( wchar_t ), L'\0' );
+
+		if ( const LSTATUS status = RegGetValueW( root, sub, value, RRF_RT_REG_MULTI_SZ, nullptr, buffer.data( ), &size ); status != ERROR_SUCCESS )
+			return std::unexpected( map_status( status ) );
+
+		buffer.resize( size / sizeof( wchar_t ) );
+
+		std::vector<std::wstring> entries;
+		std::size_t offset = 0;
+
+		while ( offset < buffer.size( ) )
+		{
+			const auto* start = buffer.c_str( ) + offset;
+			const auto length = std::wcslen( start );
+
+			if ( length == 0 )
+				break;
+
+			entries.emplace_back( start, length );
+			offset += length + 1;
+		}
+
+		return entries;
+	}
+
+	inline Core::Status write_multi_sz( const HKEY root, const wchar_t* sub, const wchar_t* value, const std::span<const std::wstring> entries )
+	{
+		std::size_t chars = 1;
+
+		for ( const auto& entry : entries )
+		{
+			chars += entry.size( ) + 1;
+		}
+
+		std::wstring buffer;
+		buffer.reserve( chars );
+
+		for ( const auto& entry : entries )
+		{
+			buffer.append( entry );
+			buffer.push_back( L'\0' );
+		}
+
+		buffer.push_back( L'\0' );
+
+		if ( const LSTATUS status = RegSetKeyValueW(
+			root, sub, value, REG_MULTI_SZ, buffer.data( ), static_cast<DWORD>( buffer.size( ) * sizeof( wchar_t ) )
+		); status != ERROR_SUCCESS )
+			return std::unexpected( map_status( status ) );
+
+		return {};
+	}
+
 	[[nodiscard]] inline Core::Result<std::vector<std::wstring>> enumerate_subkeys( const HKEY root, const wchar_t* sub )
 	{
 		const auto key = open( root, sub, KEY_READ );

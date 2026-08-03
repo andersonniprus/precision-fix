@@ -10,6 +10,7 @@ namespace
 	constexpr wchar_t power_key[ ]                  = LR"(SYSTEM\CurrentControlSet\Control\Power)";
 	constexpr wchar_t nvlddmkm_key[ ]               = LR"(SYSTEM\CurrentControlSet\Services\nvlddmkm)";
 	constexpr wchar_t display_class_key[ ]          = LR"(SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318})";
+	constexpr wchar_t dwm_key[ ]                    = LR"(SOFTWARE\Microsoft\Windows\Dwm)";
 
 	[[nodiscard]] bool contains_ci( const std::wstring_view haystack, const std::wstring_view needle )
 	{
@@ -267,5 +268,23 @@ namespace Modules
 		}
 
 		return {};
+	}
+
+	Core::Result<bool> GpuModule::load_multi_plane_overlays( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, dwm_key, L"OverlayTestMode" );
+
+		if ( !value )
+			return true;
+
+		return *value != 5;
+	}
+
+	Core::Status GpuModule::apply_multi_plane_overlays( const bool& enabled )
+	{
+		if ( enabled )
+			return Utils::Registry::delete_value( HKEY_LOCAL_MACHINE, dwm_key, L"OverlayTestMode" );
+
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, dwm_key, L"OverlayTestMode", 5 );
 	}
 }

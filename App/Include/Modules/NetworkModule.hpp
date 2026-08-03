@@ -17,6 +17,13 @@ namespace Modules
 		NicPowerSaving,
 		WakeOnLan,
 		NicOffloadTuning,
+		TcpAutoTuning,
+		EcnCapability,
+		CongestionCtcp,
+		TcpTimestamps,
+		GlobalRss,
+		DnsOverHttps,
+		QosBandwidthLimit,
 		Count,
 	};
 
@@ -61,6 +68,27 @@ namespace Modules
 
 		[[nodiscard]] static Core::Result<bool> load_nic_offload_tuning( );
 		static Core::Status apply_nic_offload_tuning( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_tcp_auto_tuning( );
+		static Core::Status apply_tcp_auto_tuning( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_ecn_capability( );
+		static Core::Status apply_ecn_capability( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_congestion_ctcp( );
+		static Core::Status apply_congestion_ctcp( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_tcp_timestamps( );
+		static Core::Status apply_tcp_timestamps( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_global_rss( );
+		static Core::Status apply_global_rss( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_dns_over_https( );
+		static Core::Status apply_dns_over_https( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_qos_bandwidth_limit( );
+		static Core::Status apply_qos_bandwidth_limit( const bool& );
 	};
 
 	template<>
@@ -215,5 +243,103 @@ namespace Modules
 
 		static constexpr auto load  = &NetworkModule::load_nic_offload_tuning;
 		static constexpr auto apply = &NetworkModule::apply_nic_offload_tuning;
+	};
+
+	template<>
+	struct FeatureTraits<NetworkFeature::TcpAutoTuning>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &NetworkModule::load_tcp_auto_tuning;
+		static constexpr auto apply = &NetworkModule::apply_tcp_auto_tuning;
+	};
+
+	template<>
+	struct FeatureTraits<NetworkFeature::EcnCapability>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &NetworkModule::load_ecn_capability;
+		static constexpr auto apply = &NetworkModule::apply_ecn_capability;
+	};
+
+	template<>
+	struct FeatureTraits<NetworkFeature::CongestionCtcp>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &NetworkModule::load_congestion_ctcp;
+		static constexpr auto apply = &NetworkModule::apply_congestion_ctcp;
+	};
+
+	template<>
+	struct FeatureTraits<NetworkFeature::TcpTimestamps>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &NetworkModule::load_tcp_timestamps;
+		static constexpr auto apply = &NetworkModule::apply_tcp_timestamps;
+	};
+
+	template<>
+	struct FeatureTraits<NetworkFeature::GlobalRss>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &NetworkModule::load_global_rss;
+		static constexpr auto apply = &NetworkModule::apply_global_rss;
+	};
+
+	template<>
+	struct FeatureTraits<NetworkFeature::DnsOverHttps>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return false;
+		}
+
+		static constexpr auto load  = &NetworkModule::load_dns_over_https;
+		static constexpr auto apply = &NetworkModule::apply_dns_over_https;
+	};
+
+	template<>
+	struct FeatureTraits<NetworkFeature::QosBandwidthLimit>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &NetworkModule::load_qos_bandwidth_limit;
+		static constexpr auto apply = &NetworkModule::apply_qos_bandwidth_limit;
 	};
 }

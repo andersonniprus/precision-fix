@@ -2,12 +2,15 @@
 #include "Modules/SystemModule.hpp"
 #include "Utils/Registry.hpp"
 #include "Utils/Power.hpp"
+#include "Utils/Service.hpp"
 
 namespace
 {
 	constexpr wchar_t priority_control_key[ ]   = LR"(SYSTEM\CurrentControlSet\Control\PriorityControl)";
 	constexpr wchar_t multimedia_profile_key[ ] = LR"(SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile)";
+	constexpr wchar_t games_profile_key[ ]      = LR"(SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games)";
 	constexpr wchar_t prefetch_key[ ]           = LR"(SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters)";
+	constexpr wchar_t memory_management_key[ ]  = LR"(SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management)";
 	constexpr wchar_t power_throttling_key[ ]   = LR"(SYSTEM\CurrentControlSet\Control\Power\PowerThrottling)";
 	constexpr wchar_t power_key[ ]              = LR"(SYSTEM\CurrentControlSet\Control\Power)";
 	constexpr wchar_t kernel_key[ ]             = LR"(SYSTEM\CurrentControlSet\Control\Session Manager\Kernel)";
@@ -23,6 +26,27 @@ namespace
 	constexpr wchar_t pushnotifications_key[ ]     = LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\PushNotifications)";
 	constexpr wchar_t desktop_key[ ]               = LR"(Control Panel\Desktop)";
 	constexpr wchar_t control_key[ ]               = LR"(SYSTEM\CurrentControlSet\Control)";
+	constexpr wchar_t game_bar_key[ ]              = LR"(Software\Microsoft\GameBar)";
+	constexpr wchar_t background_apps_key[ ]       = LR"(Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications)";
+	constexpr wchar_t delivery_opt_key[ ]          = LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config)";
+
+	[[nodiscard]] bool is_system_managed_page_entry( const std::wstring& entry )
+	{
+		if ( entry == L"?:\\pagefile.sys" )
+			return true;
+
+		const auto space = entry.find_last_of( L' ' );
+
+		if ( space == std::wstring::npos )
+			return entry.find( L"pagefile.sys" ) != std::wstring::npos;
+
+		const auto second = entry.find_last_of( L' ', space - 1 );
+
+		if ( second == std::wstring::npos )
+			return false;
+
+		return entry.substr( second + 1 ) == L"0 0";
+	}
 }
 
 namespace Modules
@@ -439,5 +463,157 @@ namespace Modules
 			return status;
 
 		return Utils::Registry::write_sz( HKEY_CURRENT_USER, desktop_key, L"LowLevelHooksTimeout", L"1000" );
+	}
+
+	Core::Result<bool> SystemModule::load_games_mmcss_profile( )
+	{
+		const auto gpu_priority = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, games_profile_key, L"GPU Priority" );
+		const auto priority     = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, games_profile_key, L"Priority" );
+		const auto scheduling   = Utils::Registry::read_sz( HKEY_LOCAL_MACHINE, games_profile_key, L"Scheduling Category" );
+		const auto sfio         = Utils::Registry::read_sz( HKEY_LOCAL_MACHINE, games_profile_key, L"SFIO Priority" );
+
+		if ( !gpu_priority || !priority || !scheduling || !sfio )
+			return false;
+
+		return *gpu_priority == 8 && *priority == 6 && *scheduling == L"High" && *sfio == L"High";
+	}
+
+	Core::Status SystemModule::apply_games_mmcss_profile( const bool& enabled )
+	{
+		if ( !enabled )
+		{
+			if ( const auto status = Utils::Registry::delete_value( HKEY_LOCAL_MACHINE, games_profile_key, L"GPU Priority" ); !status )
+				return status;
+
+			if ( const auto status = Utils::Registry::delete_value( HKEY_LOCAL_MACHINE, games_profile_key, L"Priority" ); !status )
+				return status;
+
+			if ( const auto status = Utils::Registry::delete_value( HKEY_LOCAL_MACHINE, games_profile_key, L"Scheduling Category" ); !status )
+				return status;
+
+			return Utils::Registry::delete_value( HKEY_LOCAL_MACHINE, games_profile_key, L"SFIO Priority" );
+		}
+
+		if ( const auto status = Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, games_profile_key, L"GPU Priority", 8 ); !status )
+			return status;
+
+		if ( const auto status = Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, games_profile_key, L"Priority", 6 ); !status )
+			return status;
+
+		if ( const auto status = Utils::Registry::write_sz( HKEY_LOCAL_MACHINE, games_profile_key, L"Scheduling Category", L"High" ); !status )
+			return status;
+
+		return Utils::Registry::write_sz( HKEY_LOCAL_MACHINE, games_profile_key, L"SFIO Priority", L"High" );
+	}
+
+	Core::Result<bool> SystemModule::load_game_mode( )
+	{
+		const auto auto_mode = Utils::Registry::read_dword( HKEY_CURRENT_USER, game_bar_key, L"AutoGameModeEnabled" );
+
+		if ( auto_mode )
+			return *auto_mode != 0;
+
+		const auto allow = Utils::Registry::read_dword( HKEY_CURRENT_USER, game_bar_key, L"AllowAutoGameMode" );
+
+		if ( !allow )
+			return true;
+
+		return *allow != 0;
+	}
+
+	Core::Status SystemModule::apply_game_mode( const bool& enabled )
+	{
+		if ( const auto status = Utils::Registry::write_dword( HKEY_CURRENT_USER, game_bar_key, L"AutoGameModeEnabled", enabled ? 1u : 0u );
+			!status )
+			return status;
+
+		return Utils::Registry::write_dword( HKEY_CURRENT_USER, game_bar_key, L"AllowAutoGameMode", enabled ? 1u : 0u );
+	}
+
+	Core::Result<bool> SystemModule::load_system_managed_page_file( )
+	{
+		const auto entries = Utils::Registry::read_multi_sz( HKEY_LOCAL_MACHINE, memory_management_key, L"PagingFiles" );
+
+		if ( !entries )
+		{
+			if ( entries.error( ) == Core::Error::NotFound )
+				return true;
+
+			return std::unexpected( entries.error( ) );
+		}
+
+		if ( entries->empty( ) )
+			return true;
+
+		for ( const auto& entry : *entries )
+		{
+			if ( !is_system_managed_page_entry( entry ) )
+				return false;
+		}
+
+		return true;
+	}
+
+	Core::Status SystemModule::apply_system_managed_page_file( const bool& enabled )
+	{
+		if ( !enabled )
+			return {};
+
+		constexpr std::wstring entry  = L"?:\\pagefile.sys";
+		const std::wstring entries[ ] = { entry };
+		return Utils::Registry::write_multi_sz( HKEY_LOCAL_MACHINE, memory_management_key, L"PagingFiles", entries );
+	}
+
+	Core::Result<bool> SystemModule::load_search_indexing( )
+	{
+		return Utils::Service::is_enabled( L"WSearch" );
+	}
+
+	Core::Status SystemModule::apply_search_indexing( const bool& enabled )
+	{
+		return Utils::Service::set_enabled( L"WSearch", enabled );
+	}
+
+	Core::Result<bool> SystemModule::load_sys_main( )
+	{
+		return Utils::Service::is_enabled( L"SysMain" );
+	}
+
+	Core::Status SystemModule::apply_sys_main( const bool& enabled )
+	{
+		return Utils::Service::set_enabled( L"SysMain", enabled );
+	}
+
+	Core::Result<bool> SystemModule::load_background_apps( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_CURRENT_USER, background_apps_key, L"GlobalUserDisabled" );
+
+		if ( !value )
+			return true;
+
+		return *value == 0;
+	}
+
+	Core::Status SystemModule::apply_background_apps( const bool& enabled )
+	{
+		return Utils::Registry::write_dword( HKEY_CURRENT_USER, background_apps_key, L"GlobalUserDisabled", enabled ? 0u : 1u );
+	}
+
+	Core::Result<bool> SystemModule::load_delivery_optimization( )
+	{
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, delivery_opt_key, L"DODownloadMode" );
+
+		if ( !value )
+			return true;
+
+		return *value != 0;
+	}
+
+	Core::Status SystemModule::apply_delivery_optimization( const bool& enabled )
+	{
+		if ( enabled )
+			return Utils::Registry::delete_value( HKEY_LOCAL_MACHINE, delivery_opt_key, L"DODownloadMode" );
+
+		return Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, delivery_opt_key, L"DODownloadMode", 0 );
 	}
 }

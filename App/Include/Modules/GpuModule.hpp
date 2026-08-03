@@ -12,6 +12,7 @@ namespace Modules
 		NvidiaPreemptionOverride,
 		AmdPowerGatingDisabled,
 		GraphicsLatencyTolerance,
+		MultiPlaneOverlays,
 		Count,
 	};
 
@@ -41,6 +42,9 @@ namespace Modules
 
 		[[nodiscard]] static Core::Result<bool> load_graphics_latency_tolerance( );
 		static Core::Status apply_graphics_latency_tolerance( const bool& );
+
+		[[nodiscard]] static Core::Result<bool> load_multi_plane_overlays( );
+		static Core::Status apply_multi_plane_overlays( const bool& );
 	};
 
 	template<>
@@ -125,5 +129,19 @@ namespace Modules
 
 		static constexpr auto load  = &GpuModule::load_graphics_latency_tolerance;
 		static constexpr auto apply = &GpuModule::apply_graphics_latency_tolerance;
+	};
+
+	template<>
+	struct FeatureTraits<GpuFeature::MultiPlaneOverlays>
+	{
+		using value_type = bool;
+
+		static constexpr value_type fallback( ) noexcept
+		{
+			return true;
+		}
+
+		static constexpr auto load  = &GpuModule::load_multi_plane_overlays;
+		static constexpr auto apply = &GpuModule::apply_multi_plane_overlays;
 	};
 }

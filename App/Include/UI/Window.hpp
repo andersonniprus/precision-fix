@@ -3,6 +3,9 @@
 #include "UI/D3D11Device.hpp"
 #include "UI/Managers/TabManager.hpp"
 #include "UI/Managers/FontManager.hpp"
+#include "Settings.hpp"
+#include "Logger.hpp"
+#include "Intl.hpp"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND, UINT, WPARAM, LPARAM );
 
@@ -11,7 +14,12 @@ namespace UI
 	class Window
 	{
 	public:
-		explicit Window( const wchar_t*, const ImVec2& );
+		Window(
+			const wchar_t*,
+			const ImVec2&,
+			std::shared_ptr<App::Settings>,
+			std::shared_ptr<App::Logger>,
+			std::shared_ptr<App::Intl> );
 		~Window( );
 
 		Window( const Window& )            = delete;
@@ -37,6 +45,7 @@ namespace UI
 		static void shutdown_imgui( );
 
 		void render_title_bar( );
+		void sync_theme( );
 
 		static LRESULT CALLBACK wnd_proc( HWND, UINT, WPARAM, LPARAM );
 
@@ -48,6 +57,10 @@ namespace UI
 
 		std::unique_ptr<D3D11Device> d3d_device_;
 		Managers::FontManager font_manager_;
+
+		std::shared_ptr<App::Settings> settings_;
+		std::shared_ptr<App::Logger> logger_;
+		std::shared_ptr<App::Intl> intl_;
 
 		ServiceHub hub_;
 		Managers::TabManager tab_manager_;

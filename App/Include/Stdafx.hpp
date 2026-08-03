@@ -39,5 +39,10 @@
 #include <utility>
 #include <variant>
 
+#include <chrono>
+#include <deque>
+#include <mutex>
+#include <optional>
+
 #include "Error.hpp"
 #include "ServiceHub.hpp"

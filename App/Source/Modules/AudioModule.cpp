@@ -1,6 +1,7 @@
 #include "Stdafx.hpp"
 #include "Modules/AudioModule.hpp"
 #include "Utils/Com.hpp"
+#include "Utils/Registry.hpp"
 
 #include <initguid.h>
 #include <mmdeviceapi.h>
@@ -10,6 +11,12 @@
 namespace
 {
 	using Microsoft::WRL::ComPtr;
+
+	// {b3f8fa53-0004-438e-9003-51a46e139bfc},3 — allow exclusive mode
+	// {b3f8fa53-0004-438e-9003-51a46e139bfc},4 — give exclusive mode priority
+	constexpr wchar_t exclusive_allow[ ]    = L"{b3f8fa53-0004-438e-9003-51a46e139bfc},3";
+	constexpr wchar_t exclusive_priority[ ] = L"{b3f8fa53-0004-438e-9003-51a46e139bfc},4";
+	constexpr wchar_t mmdevices_render[ ]   = LR"(SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render)";
 
 	[[nodiscard]] Core::Error map_hresult( const HRESULT hr ) noexcept
 	{
@@ -55,6 +62,24 @@ namespace
 			return std::unexpected( map_hresult( hr ) );
 
 		return {};
+	}
+
+	[[nodiscard]] Core::Result<std::vector<std::wstring>> render_property_keys( )
+	{
+		const auto devices = Utils::Registry::enumerate_subkeys( HKEY_LOCAL_MACHINE, mmdevices_render );
+
+		if ( !devices )
+			return std::unexpected( devices.error( ) );
+
+		std::vector<std::wstring> keys;
+		keys.reserve( devices->size( ) );
+
+		for ( const auto& id : *devices )
+		{
+			keys.push_back( std::wstring { mmdevices_render } + L'\\' + id + L"\\Properties" );
+		}
+
+		return keys;
 	}
 }
 
@@ -133,6 +158,48 @@ namespace Modules
 				continue;
 
 			if ( const auto status = set_sysfx( device, !enabled ); !status )
+				return status;
+		}
+
+		return {};
+	}
+
+	Core::Result<bool> AudioModule::load_exclusive_mode( )
+	{
+		const auto keys = render_property_keys( );
+
+		if ( !keys )
+			return std::unexpected( keys.error( ) );
+
+		if ( keys->empty( ) )
+			return true;
+
+		const auto value = Utils::Registry::read_dword( HKEY_LOCAL_MACHINE, keys->front( ).c_str( ), exclusive_allow );
+
+		if ( !value )
+			return true;
+
+		return *value == 0;
+	}
+
+	Core::Status AudioModule::apply_exclusive_mode( const bool& enabled )
+	{
+		const auto keys = render_property_keys( );
+
+		if ( !keys )
+			return std::unexpected( keys.error( ) );
+
+		if ( keys->empty( ) )
+			return std::unexpected( Core::Error::NotFound );
+
+		const std::uint32_t deny = enabled ? 0u : 1u;
+
+		for ( const auto& key : *keys )
+		{
+			if ( const auto status = Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, key.c_str( ), exclusive_allow, deny ); !status )
+				return status;
+
+			if ( const auto status = Utils::Registry::write_dword( HKEY_LOCAL_MACHINE, key.c_str( ), exclusive_priority, deny ); !status )
 				return status;
 		}
 

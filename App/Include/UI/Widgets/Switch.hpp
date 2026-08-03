@@ -58,8 +58,8 @@ namespace UI::Widgets
 		const float inv = 1.f - a.t;
 		const float e   = 1.f - inv * inv * inv * inv;
 
-		constexpr ImVec4 off = Theme::Elevated;
-		constexpr ImVec4 on  = Theme::Primary;
+		const ImVec4 off = Theme::Elevated;
+		const ImVec4 on  = Theme::Primary;
 
 		ImVec4 track {
 			off.x + ( on.x - off.x ) * e,
